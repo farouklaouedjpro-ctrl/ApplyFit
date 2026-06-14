@@ -5,236 +5,362 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ApplyFit - Analyse CV & Offre d'emploi</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="noise"></div>
+  <div id="app" style="display:flex; min-height:100vh; background:#EEF1F6; color:#101826; font-family:'IBM Plex Sans',system-ui,sans-serif; -webkit-font-smoothing:antialiased;">
 
-  <header>
-    <div class="container">
-      <div class="header-content">
-        <div class="logo">
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-            <rect width="32" height="32" rx="8" fill="url(#logo-grad)"/>
-            <path d="M16 8a5 5 0 015 5v1h.5a2.5 2.5 0 012.5 2.5v7a2.5 2.5 0 01-2.5 2.5h-11A2.5 2.5 0 018 23.5v-7A2.5 2.5 0 0110.5 14H11v-1a5 5 0 015-5zm0 2a3 3 0 00-3 3v1h6v-1a3 3 0 00-3-3zm-3.5 6a1 1 0 00-1 1v5a1 1 0 001 1h7a1 1 0 001-1v-5a1 1 0 00-1-1h-7z" fill="white"/>
-            <defs>
-              <linearGradient id="logo-grad" x1="0" y1="0" x2="32" y2="32">
-                <stop stop-color="#6366F1"/>
-                <stop offset="1" stop-color="#A855F7"/>
-              </linearGradient>
-            </defs>
-          </svg>
-          <span>ApplyFit</span>
+    <!-- ============ SIDEBAR ============ -->
+    <aside id="sidebar" class="afb-aside" style="width:264px; flex-shrink:0; background:#0E1626; color:#C7D0DE; display:flex; flex-direction:column; position:sticky; top:0; height:100vh;">
+      <div style="padding:22px 22px 18px; display:flex; align-items:center; gap:11px; border-bottom:1px solid rgba(255,255,255,.07);">
+        <div style="width:32px; height:32px; border-radius:8px; background:#2F6BFF; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-weight:700; color:#fff; font-size:17px;">A</div>
+        <div>
+          <div style="font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:700; color:#fff; letter-spacing:-.3px;">ApplyFit</div>
+          <div style="font-size:11px; color:#6B7689;">Espace candidat</div>
         </div>
-        <p class="tagline">Optimisez votre candidature en un clic</p>
       </div>
-    </div>
-  </header>
 
-  <main class="container">
-    <section class="intro">
-      <h1>Analysez la compatibilité de votre CV avec une offre d'emploi</h1>
-      <p>Notre IA analyse votre CV et l'offre pour calculer un score de matching, identifier les compétences manquantes et suggérer des améliorations.</p>
-    </section>
+      <div class="afb-new" style="padding:16px 14px 8px;">
+        <button id="newAnalysisBtn" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; background:#2F6BFF; color:#fff; border:none; border-radius:10px; font-family:inherit; font-size:13.5px; font-weight:600; cursor:pointer; white-space:nowrap;">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Nouvelle analyse
+        </button>
+      </div>
 
-    <section class="input-section">
-      <div class="card cv-card">
-        <div class="card-header">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm7 0l3 3h-3V4zM6 10a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm0 3a1 1 0 011-1h4a1 1 0 110 2H7a1 1 0 01-1-1z" fill="currentColor"/></svg>
-          <h2>Votre CV</h2>
+      <div class="afb-hide-mobile" style="padding:18px 22px 8px; font-size:11px; font-weight:600; letter-spacing:.6px; text-transform:uppercase; color:#5B6678;">Historique</div>
+      <div class="afb-sb afb-hide-mobile" id="historyList" style="flex:1; overflow-y:auto; padding:0 12px;"></div>
+
+      <div class="afb-hide-mobile" style="padding:14px; border-top:1px solid rgba(255,255,255,.07); display:flex; align-items:center; gap:11px;">
+        <div style="width:34px; height:34px; border-radius:50%; background:#2F6BFF; color:#fff; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700;">TM</div>
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:13px; font-weight:600; color:#E6EBF2;">Thomas Martin</div>
+          <div style="font-size:11px; color:#6B7689;">Plan gratuit</div>
         </div>
-        <div class="drop-zone" id="dropZone">
-          <div class="drop-zone-content">
-            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" class="upload-icon">
-              <path d="M24 32V16m0 0l-6 6m6-6l6 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M8 32v4a4 4 0 004 4h24a4 4 0 004-4v-4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-            </svg>
-            <p class="drop-text">Déposez votre CV ici <span class="or">ou</span></p>
-            <div class="btn btn-secondary btn-file">
-              <input type="file" id="fileInput" accept=".txt,.pdf,.doc,.docx" class="file-input-hidden">
-              <span class="btn-text">Parcourir</span>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="#6B7689" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </aside>
+
+    <!-- ============ MAIN ============ -->
+    <div style="flex:1; min-width:0; display:flex; flex-direction:column;">
+
+      <!-- VIEW: Input -->
+      <div id="viewInput" style="padding:28px 36px; max-width:1180px; width:100%; margin:0 auto;">
+        <div style="margin-bottom:24px;">
+          <div style="font-size:12.5px; font-weight:600; color:#2F6BFF; letter-spacing:.4px; text-transform:uppercase; margin-bottom:6px;">Nouvelle analyse</div>
+          <h1 style="font-family:'Space Grotesk',sans-serif; font-size:30px; font-weight:700; letter-spacing:-.6px; margin:0 0 6px;">Comparez votre CV à l'offre</h1>
+          <p style="font-size:15px; color:#5B6678; margin:0;">Importez les deux documents. Le moteur calcule un score pondéré et un plan d'action.</p>
+        </div>
+
+        <div class="afb-inputs" style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
+
+          <!-- CV panel -->
+          <div data-drop="cv" style="background:#fff; border:1px solid #E1E6EF; border-radius:14px; padding:22px; transition:border-color .2s,background .2s;">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:16px; flex-wrap:wrap;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div style="width:32px; height:32px; border-radius:8px; background:#EAF0FF; display:flex; align-items:center; justify-content:center;"><svg width="17" height="17" viewBox="0 0 20 20" fill="none"><path d="M5 3a1 1 0 011-1h6l4 4v11a1 1 0 01-1 1H6a1 1 0 01-1-1V3z" stroke="#2F6BFF" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 10h5M8 13h4" stroke="#2F6BFF" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+                <span style="font-size:15px; font-weight:600;">Votre CV</span>
+              </div>
+              <div id="cvSegments" style="display:flex; gap:3px; padding:3px; background:#EEF1F6; border-radius:9px;">
+                <button id="cvFileMode" class="seg-btn active" style="padding:6px 12px; border:none; border-radius:6px; font-family:inherit; font-size:12.5px; font-weight:600; cursor:pointer;">Importer</button>
+                <button id="cvPasteMode" class="seg-btn" style="padding:6px 12px; border:none; border-radius:6px; font-family:inherit; font-size:12.5px; font-weight:600; cursor:pointer; background:transparent; color:#5B6678;">Coller</button>
+              </div>
             </div>
-            <p class="file-hint">Formats supportés : TXT, PDF, DOC</p>
+
+            <div id="cvFilePanel">
+              <div id="cvFileInfo" style="display:none; align-items:center; gap:11px; padding:14px; background:#F4F6FA; border:1px solid #E1E6EF; border-radius:11px; margin-bottom:13px;">
+                <div style="width:34px; height:34px; border-radius:8px; background:#EAF0FF; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="17" height="17" viewBox="0 0 20 20" fill="none"><path d="M5 3a1 1 0 011-1h6l4 4v11a1 1 0 01-1 1H6a1 1 0 01-1-1V3z" fill="#2F6BFF" opacity=".22"/></svg></div>
+                <div style="flex:1; min-width:0;">
+                  <div id="cvFileName" style="font-size:13.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></div>
+                  <div id="cvFileStatus" style="font-size:11.5px; color:#16A34A; font-weight:600; display:flex; align-items:center; gap:4px;"><svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M4 8.5l2.5 2.5 5-6" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Importé</div>
+                </div>
+                <button id="cvRemoveFile" title="Retirer le fichier" style="width:30px; height:30px; border-radius:8px; border:none; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="#9AA4B2" stroke-width="1.7" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+              <div id="cvDropZone" style="border:2px dashed #CBD5E6; border-radius:12px; padding:30px 18px; text-align:center; cursor:pointer; background:#FAFBFD; margin-bottom:13px;">
+                <div style="width:46px; height:46px; border-radius:12px; background:#EAF0FF; display:flex; align-items:center; justify-content:center; margin:0 auto 12px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5" stroke="#2F6BFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 16v2a2 2 0 002 2h10a2 2 0 002-2v-2" stroke="#2F6BFF" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+                <div style="font-size:14px; font-weight:600; margin-bottom:3px;">Glissez votre CV ici</div>
+                <div style="font-size:12.5px; color:#9AA4B2; margin-bottom:13px;">ou cliquez pour parcourir</div>
+                <span style="display:inline-block; padding:8px 18px; background:#101826; color:#fff; border-radius:8px; font-size:13px; font-weight:600;">Parcourir</span>
+                <div style="font-size:11.5px; color:#A9B2C0; margin-top:13px;">PDF, DOCX ou TXT — 5 Mo max</div>
+              </div>
+              <input type="file" id="cvFileInput" accept=".txt,.pdf,.doc,.docx" style="display:none">
+            </div>
+            <div id="cvPastePanel" style="display:none;">
+              <textarea id="cvText" class="afb-ta" rows="7" placeholder="Collez ici le contenu de votre CV…" style="width:100%; box-sizing:border-box; padding:12px 14px; border:1px solid #E1E6EF; border-radius:10px; background:#F8FAFC; font-family:'IBM Plex Sans',sans-serif; font-size:13px; line-height:1.6; color:#101826; resize:vertical;"></textarea>
+            </div>
           </div>
-          <div class="file-info" id="fileInfo" style="display:none">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" fill="currentColor" opacity=".3"/><path d="M12 2l4 4h-4V2z" fill="currentColor" opacity=".5"/></svg>
-            <span id="fileName"></span>
-            <button class="btn-icon" id="removeFile" title="Supprimer">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+
+          <!-- Offer panel -->
+          <div data-drop="offer" style="background:#fff; border:1px solid #E1E6EF; border-radius:14px; padding:22px; transition:border-color .2s,background .2s;">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:16px; flex-wrap:wrap;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div style="width:32px; height:32px; border-radius:8px; background:#FFF1E4; display:flex; align-items:center; justify-content:center;"><svg width="17" height="17" viewBox="0 0 20 20" fill="none"><rect x="3" y="6" width="14" height="11" rx="1.5" stroke="#D98A00" stroke-width="1.5"/><path d="M7 6V5a2 2 0 012-2h2a2 2 0 012 2v1" stroke="#D98A00" stroke-width="1.5"/></svg></div>
+                <span style="font-size:15px; font-weight:600;">Offre d'emploi</span>
+              </div>
+              <div id="offerSegments" style="display:flex; gap:3px; padding:3px; background:#EEF1F6; border-radius:9px;">
+                <button id="offerFileMode" class="seg-btn active" style="padding:6px 12px; border:none; border-radius:6px; font-family:inherit; font-size:12.5px; font-weight:600; cursor:pointer;">Importer</button>
+                <button id="offerPasteMode" class="seg-btn" style="padding:6px 12px; border:none; border-radius:6px; font-family:inherit; font-size:12.5px; font-weight:600; cursor:pointer; background:transparent; color:#5B6678;">Coller</button>
+              </div>
+            </div>
+
+            <div id="offerFilePanel">
+              <div id="offerFileInfo" style="display:none; align-items:center; gap:11px; padding:14px; background:#F4F6FA; border:1px solid #E1E6EF; border-radius:11px; margin-bottom:13px;">
+                <div style="width:34px; height:34px; border-radius:8px; background:#FFF1E4; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="17" height="17" viewBox="0 0 20 20" fill="none"><path d="M5 3a1 1 0 011-1h6l4 4v11a1 1 0 01-1 1H6a1 1 0 01-1-1V3z" fill="#D98A00" opacity=".22"/></svg></div>
+                <div style="flex:1; min-width:0;">
+                  <div id="offerFileName" style="font-size:13.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></div>
+                  <div id="offerFileStatus" style="font-size:11.5px; color:#16A34A; font-weight:600; display:flex; align-items:center; gap:4px;"><svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M4 8.5l2.5 2.5 5-6" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Importé</div>
+                </div>
+                <button id="offerRemoveFile" title="Retirer le fichier" style="width:30px; height:30px; border-radius:8px; border:none; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="#9AA4B2" stroke-width="1.7" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+              <div id="offerDropZone" style="border:2px dashed #CBD5E6; border-radius:12px; padding:30px 18px; text-align:center; cursor:pointer; background:#FAFBFD; margin-bottom:13px;">
+                <div style="width:46px; height:46px; border-radius:12px; background:#FFF1E4; display:flex; align-items:center; justify-content:center; margin:0 auto 12px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5" stroke="#D98A00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 16v2a2 2 0 002 2h10a2 2 0 002-2v-2" stroke="#D98A00" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+                <div style="font-size:14px; font-weight:600; margin-bottom:3px;">Glissez l'offre ici</div>
+                <div style="font-size:12.5px; color:#9AA4B2; margin-bottom:13px;">ou cliquez pour parcourir</div>
+                <span style="display:inline-block; padding:8px 18px; background:#101826; color:#fff; border-radius:8px; font-size:13px; font-weight:600;">Parcourir</span>
+                <div style="font-size:11.5px; color:#A9B2C0; margin-top:13px;">PDF, DOCX ou TXT — 5 Mo max</div>
+              </div>
+              <input type="file" id="offerFileInput" accept=".txt,.pdf,.doc,.docx" style="display:none">
+            </div>
+            <div id="offerPastePanel" style="display:none;">
+              <textarea id="offerText" class="afb-ta" rows="7" placeholder="Collez ici le contenu de l'offre…" style="width:100%; box-sizing:border-box; padding:12px 14px; border:1px solid #E1E6EF; border-radius:10px; background:#F8FAFC; font-family:'IBM Plex Sans',sans-serif; font-size:13px; line-height:1.6; color:#101826; resize:vertical;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="afb-band" style="display:flex; align-items:center; justify-content:space-between; gap:14px; margin-top:22px; padding:18px 22px; background:#fff; border:1px solid #E1E6EF; border-radius:14px; flex-wrap:wrap;">
+          <div id="hintBox" style="display:flex; align-items:center; gap:10px; font-size:13px; color:#5B6678;">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 2l6 3v5c0 3.5-2.5 6.5-6 8-3.5-1.5-6-4.5-6-8V5l6-3z" stroke="#9AA4B2" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Traitement local et sécurisé · aucun stockage
+          </div>
+          <button id="analyzeBtn" disabled style="display:inline-flex; align-items:center; gap:9px; padding:13px 28px; background:#9AA4B2; color:#fff; border:none; border-radius:10px; font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600; cursor:not-allowed; opacity:.7;">
+            Lancer l'analyse
+            <svg width="17" height="17" viewBox="0 0 20 20" fill="none"><path d="M4 10h11M11 5l5 5-5 5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- VIEW: Analyzing -->
+      <div id="viewAnalyzing" style="display:none; flex:1; flex-direction:column; align-items:center; justify-content:center; padding:60px;">
+        <div style="display:flex; align-items:flex-end; gap:6px; height:60px; margin-bottom:30px;">
+          <div class="afb-bar" style="animation-delay:0s;"></div>
+          <div class="afb-bar" style="animation-delay:.15s;"></div>
+          <div class="afb-bar" style="animation-delay:.3s;"></div>
+          <div class="afb-bar" style="animation-delay:.45s;"></div>
+        </div>
+        <h2 style="font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:700; margin:0 0 8px;">Analyse en cours</h2>
+        <p style="font-size:14px; color:#5B6678; margin:0 0 28px;">Extraction et mise en correspondance des compétences</p>
+        <div id="analyzeSteps" style="width:100%; max-width:380px; display:flex; flex-direction:column; gap:6px;"></div>
+      </div>
+
+      <!-- VIEW: Results -->
+      <div id="viewResults" style="display:none; padding:24px 36px 70px; max-width:1180px; width:100%; margin:0 auto;">
+        <!-- toolbar -->
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:16px; flex-wrap:wrap;">
+          <div>
+            <h1 id="resultJobTitle" style="font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:700; letter-spacing:-.4px; margin:0 0 3px;">Développeur Full-Stack JavaScript</h1>
+            <div id="resultMeta" style="font-size:13.5px; color:#5B6678;">Nexora · Paris · CDI · analysé le 14 juin</div>
+          </div>
+          <div style="display:flex; gap:9px;">
+            <button style="display:inline-flex; align-items:center; gap:7px; padding:9px 15px; background:#fff; border:1px solid #D7DEEA; border-radius:9px; font-family:inherit; font-size:13px; font-weight:600; cursor:pointer;">
+              <svg width="15" height="15" viewBox="0 0 20 20" fill="none"><path d="M7 8l3-3 3 3M10 5v8M5 14v1a2 2 0 002 2h6a2 2 0 002-2v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Partager
+            </button>
+            <button style="display:inline-flex; align-items:center; gap:7px; padding:9px 15px; background:#fff; border:1px solid #D7DEEA; border-radius:9px; font-family:inherit; font-size:13px; font-weight:600; cursor:pointer;">
+              <svg width="15" height="15" viewBox="0 0 20 20" fill="none"><path d="M10 13V3m0 10l-3.5-3.5M10 13l3.5-3.5M4 14v1a2 2 0 002 2h8a2 2 0 002-2v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Exporter PDF
             </button>
           </div>
         </div>
-        <div class="textarea-container">
-          <label for="cvText">Ou collez le contenu de votre CV</label>
-          <textarea id="cvText" placeholder="Collez ici le contenu de votre CV (expériences, compétences, formations...)" rows="6"></textarea>
-        </div>
-      </div>
 
-      <div class="card offer-card">
-        <div class="card-header">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2a6 6 0 00-6 6v3.5a2.5 2.5 0 01-2.5 2.5H1v2h18v-2h-.5a2.5 2.5 0 01-2.5-2.5V8a6 6 0 00-6-6z" fill="currentColor"/></svg>
-          <h2>Offre d'emploi</h2>
-        </div>
-        <div class="drop-zone" id="dropZoneOffer">
-          <div class="drop-zone-content">
-            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" class="upload-icon">
-              <path d="M24 32V16m0 0l-6 6m6-6l6 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M8 32v4a4 4 0 004 4h24a4 4 0 004-4v-4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-            </svg>
-            <p class="drop-text">Déposez l'offre ici <span class="or">ou</span></p>
-            <div class="btn btn-secondary btn-file">
-              <input type="file" id="fileInputOffer" accept=".txt,.pdf,.doc,.docx" class="file-input-hidden">
-              <span class="btn-text">Parcourir</span>
+        <!-- résumé exécutif + mode/confiance -->
+        <div id="execBar" style="display:flex; align-items:center; justify-content:space-between; gap:22px; background:#101826; border-radius:14px; padding:20px 24px; margin-bottom:16px;">
+          <div style="min-width:0;">
+            <div style="display:inline-flex; align-items:center; gap:7px; padding:4px 11px; background:rgba(47,107,255,.2); border-radius:99px; margin-bottom:10px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 3l2.2 5.3L20 9.5l-4.4 3.6L17 19l-5-3.2L7 19l1.4-5.9L4 9.5l5.8-1.2z" stroke="#7FB0FF" stroke-width="1.8" stroke-linejoin="round"/></svg>
+              <span id="modeLabel" style="font-size:11.5px; font-weight:700; color:#9CC0FF; letter-spacing:.2px; white-space:nowrap;">Analyse IA · Gemini 2.0 Flash</span>
             </div>
-            <p class="file-hint">Formats supportés : TXT, PDF, DOC</p>
+            <div id="execSummary" style="font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:600; color:#fff; line-height:1.35;">Profil solide — 4 actions pour passer de 74 à 90.</div>
           </div>
-          <div class="file-info" id="fileInfoOffer" style="display:none">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" fill="currentColor" opacity=".3"/><path d="M12 2l4 4h-4V2z" fill="currentColor" opacity=".5"/></svg>
-            <span id="fileNameOffer"></span>
-            <button class="btn-icon" id="removeFileOffer" title="Supprimer">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-            </button>
+          <div class="afb-band-right" style="flex-shrink:0; width:230px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:7px;">
+              <span style="font-size:12px; color:#9AA4B2;">Confiance de l'analyse</span>
+              <span id="confidenceLabel" style="font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:700; color:#7FD0A6;">92%</span>
+            </div>
+            <div id="confidenceBar" style="height:7px; background:rgba(255,255,255,.1); border-radius:99px; overflow:hidden;">
+              <div style="height:100%; border-radius:99px; background:linear-gradient(90deg,#2F6BFF,#7FD0A6); width:92%; transition:width 1s ease;"></div>
+            </div>
+            <div style="font-size:11px; color:#6B7689; margin-top:8px; line-height:1.4;">Bascule en analyse locale si l'IA est indisponible.</div>
           </div>
         </div>
-        <div class="textarea-container">
-          <label for="offerText">Ou collez le contenu de l'offre</label>
-          <textarea id="offerText" placeholder="Collez ici l'offre d'emploi (intitulé du poste, missions, pré-requis, compétences demandées...)" rows="6"></textarea>
-        </div>
-      </div>
 
-      <div class="error-message" id="errorMessage" style="display:none">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1.5a7.5 7.5 0 100 15 7.5 7.5 0 000-15zM9 5.5v4M9 12.5h.008" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        <span id="errorText"></span>
-      </div>
-      <button class="btn btn-primary btn-analyze" id="analyzeBtn" disabled>
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9zM4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" fill="currentColor"/></svg>
-        <span>Lancer l'analyse</span>
-      </button>
-    </section>
-
-    <section class="results-section" id="resultsSection" style="display:none">
-      <div class="results-header">
-        <h2>Résultats de l'analyse</h2>
-        <span class="badge" id="scoreBadge">Score global</span>
-      </div>
-
-      <div class="results-grid">
-        <div class="card score-card">
-          <div class="card-header">
-            <h3>Score de matching</h3>
+        <!-- KPI strip -->
+        <div id="kpiGrid" class="afb-grid" style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:16px;">
+          <div style="background:#fff; border:1px solid #E1E6EF; border-radius:13px; padding:18px;">
+            <div style="font-size:12px; color:#5B6678; font-weight:500; margin-bottom:8px;">Score actuel</div>
+            <div style="display:flex; align-items:baseline; gap:6px;"><span id="kpiScore" style="font-family:'Space Grotesk',sans-serif; font-size:30px; font-weight:700;">0</span><span style="font-size:14px; color:#9AA4B2; font-weight:600;">/100</span></div>
           </div>
-          <div class="gauge-wrapper">
-            <canvas id="gaugeChart"></canvas>
-            <div class="gauge-label">
-              <span class="gauge-score" id="gaugeScore">0</span>
-              <span class="gauge-unit">%</span>
+          <div style="background:#fff; border:1px solid #E1E6EF; border-radius:13px; padding:18px;">
+            <div style="font-size:12px; color:#5B6678; font-weight:500; margin-bottom:8px;">Compétences en phase</div>
+            <div style="display:flex; align-items:baseline; gap:6px;"><span id="kpiFound" style="font-family:'Space Grotesk',sans-serif; font-size:30px; font-weight:700; color:#16A34A;">0</span><span style="font-size:13px; color:#9AA4B2; font-weight:600;">détectées</span></div>
+          </div>
+          <div style="background:#fff; border:1px solid #E1E6EF; border-radius:13px; padding:18px;">
+            <div style="font-size:12px; color:#5B6678; font-weight:500; margin-bottom:8px;">À renforcer</div>
+            <div style="display:flex; align-items:baseline; gap:6px;"><span id="kpiMissing" style="font-family:'Space Grotesk',sans-serif; font-size:30px; font-weight:700; color:#E5484D;">0</span><span style="font-size:13px; color:#9AA4B2; font-weight:600;">manquantes</span></div>
+          </div>
+          <div id="kpiProjectedBox" style="background:#101826; border:1px solid #101826; border-radius:13px; padding:18px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;"><span style="font-size:12px; color:#9AA4B2; font-weight:500;">Score projeté</span><span id="deltaLabel" style="font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:99px; background:rgba(255,255,255,.1); color:#9AA4B2;">à activer</span></div>
+            <div style="display:flex; align-items:baseline; gap:6px;"><span id="kpiProjected" style="font-family:'Space Grotesk',sans-serif; font-size:30px; font-weight:700; color:#7FD0A6;">0</span><span style="font-size:13px; color:#6B7689; font-weight:600;">/100</span></div>
+          </div>
+        </div>
+
+        <!-- tabs -->
+        <div style="display:flex; align-items:center; gap:9px; margin-bottom:11px;">
+          <span style="font-size:12px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; color:#8A95A6;">Explorez votre analyse</span>
+          <span style="flex:1; height:1px; background:#DDE3EC;"></span>
+        </div>
+        <div id="tabNav" class="afb-tabs" role="tablist" style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px;">
+
+          <button id="tabOverviewBtn" class="tab-btn" role="tab" aria-selected="true" style="display:flex; align-items:center; gap:13px; padding:15px 17px; text-align:left; border:1.5px solid #2F6BFF; background:#fff; border-radius:14px; cursor:pointer; font-family:inherit; box-shadow:0 8px 20px -10px rgba(47,107,255,.45);">
+            <div style="width:40px; height:40px; border-radius:11px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:#EAF0FF;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 20V10M12 20V4M18 20V14" stroke="#2F6BFF" stroke-width="2.2" stroke-linecap="round"/></svg>
+            </div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:14.5px; font-weight:700; color:#101826;">Vue d'ensemble</div>
+              <div style="font-size:12px; color:#5B6678; margin-top:1px;">Score &amp; catégories</div>
+            </div>
+            <span style="width:9px; height:9px; border-radius:50%; flex-shrink:0; background:#2F6BFF;"></span>
+          </button>
+
+          <button id="tabSkillsBtn" class="tab-btn" role="tab" aria-selected="false" style="display:flex; align-items:center; gap:13px; padding:15px 17px; text-align:left; border:1.5px solid #E1E6EF; background:#fff; border-radius:14px; cursor:pointer; font-family:inherit; box-shadow:none;">
+            <div style="width:40px; height:40px; border-radius:11px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:#EEF1F6;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3l2.2 5.3L20 9.5l-4.4 3.6L17 19l-5-3.2L7 19l1.4-5.9L4 9.5l5.8-1.2z" stroke="#7A8699" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            </div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:14.5px; font-weight:700; color:#101826;">Compétences</div>
+              <div style="font-size:12px; color:#9AA4B2; margin-top:1px;">Mots-clés &amp; reformulations</div>
+            </div>
+            <span id="skillCountBadge" style="font-size:11px; font-weight:700; padding:3px 8px; border-radius:99px; flex-shrink:0; background:#EEF1F6; color:#7A8699;">0</span>
+          </button>
+
+          <button id="tabPlanBtn" class="tab-btn" role="tab" aria-selected="false" style="display:flex; align-items:center; gap:13px; padding:15px 17px; text-align:left; border:1.5px solid #E1E6EF; background:#fff; border-radius:14px; cursor:pointer; font-family:inherit; box-shadow:none;">
+            <div style="width:40px; height:40px; border-radius:11px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:#EEF1F6;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 21V4M6 4h11l-2 3.5L17 11H6" stroke="#7A8699" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:14.5px; font-weight:700; color:#101826;">Plan d'action</div>
+              <div style="font-size:12px; color:#9AA4B2; margin-top:1px;">Vos actions priorisées</div>
+            </div>
+            <span id="planCountBadge" style="font-size:11px; font-weight:700; padding:3px 8px; border-radius:99px; flex-shrink:0; background:#EEF1F6; color:#7A8699;">0</span>
+          </button>
+
+        </div>
+
+        <!-- TAB: Overview -->
+        <div id="tabOverview" class="tab-content">
+          <div id="overviewGrid" style="display:grid; grid-template-columns:340px 1fr; gap:16px;">
+            <div style="background:#fff; border:1px solid #E1E6EF; border-radius:14px; padding:26px; display:flex; flex-direction:column; align-items:center;">
+              <div style="font-size:13px; font-weight:600; color:#5B6678; align-self:flex-start; margin-bottom:14px;">Score de compatibilité</div>
+              <div id="gaugeContainer" role="img" aria-label="Score" style="position:relative; width:180px; height:180px;">
+                <svg width="180" height="180" viewBox="0 0 180 180" style="transform:rotate(-90deg);">
+                  <circle cx="90" cy="90" r="78" fill="none" stroke="#EDF0F5" stroke-width="14"/>
+                  <circle id="gaugeArcProj" cx="90" cy="90" r="78" fill="none" stroke="rgba(22,163,74,.3)" stroke-width="14" stroke-linecap="round" stroke-dasharray="490.1" stroke-dashoffset="490.1" style="transition:stroke-dashoffset .7s cubic-bezier(.2,.7,.2,1);"></circle>
+                  <circle id="gaugeArc" cx="90" cy="90" r="78" fill="none" stroke="#16A34A" stroke-width="14" stroke-linecap="round" stroke-dasharray="490.1" stroke-dashoffset="490.1" style="transition:stroke-dashoffset 1.1s cubic-bezier(.2,.7,.2,1);"></circle>
+                </svg>
+                <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                  <div id="gaugeScore" style="font-family:'Space Grotesk',sans-serif; font-size:52px; font-weight:700; line-height:1; color:#16A34A;">0</div>
+                  <div style="font-size:11px; font-weight:600; letter-spacing:.6px; color:#9AA4B2;">SUR 100</div>
+                </div>
+              </div>
+              <div id="verdictBox" style="margin-top:18px; padding:10px 16px; border-radius:10px; width:100%; text-align:center;">
+                <div id="verdictTitle" style="font-size:14px; font-weight:700;">Forte compatibilité</div>
+                <div id="verdictMessage" style="font-size:12.5px; color:#5B6678; margin-top:3px;">Profil très aligné avec l'offre.</div>
+              </div>
+              <div id="projCard" style="margin-top:10px; width:100%; box-sizing:border-box; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 16px; border-radius:10px; cursor:pointer; border:1px dashed #DCE3EC; background:#F7FAFC;">
+                <div style="text-align:left;">
+                  <div style="font-size:12px; color:#5B6678;">Avec votre plan d'action</div>
+                  <div id="projHint" style="font-size:12.5px; font-weight:600; color:#16A34A;">jusqu'à +16 pts · cochez le plan</div>
+                </div>
+                <div style="font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:700; color:#16A34A;">0</div>
+              </div>
+            </div>
+
+            <div style="background:#fff; border:1px solid #E1E6EF; border-radius:14px; padding:24px;">
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
+                <h3 style="font-size:15px; font-weight:600; margin:0;">Score par catégorie</h3>
+                <span style="font-size:12px; color:#9AA4B2;">% = pondération dans l'offre</span>
+              </div>
+              <div id="categoriesGrid" style="display:grid; grid-template-columns:1fr 1fr; gap:13px;"></div>
             </div>
           </div>
-          <div class="score-message" id="scoreMessage"></div>
-          <div class="confidence-wrapper" id="confidenceWrapper" style="display:none">
-            <div class="confidence-bar-track">
-              <div class="confidence-bar-fill" id="confidenceFill"></div>
+
+          <div id="alertBanner" style="display:none; background:#FFFBEB; border:1px solid #F2E2B5; border-radius:13px; padding:18px 20px; gap:13px; margin-top:16px;">
+            <div style="width:30px; height:30px; border-radius:8px; background:#FBEFC6; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 3l7 13H3l7-13z" stroke="#B07908" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 8.5v3M10 13.5h.01" stroke="#B07908" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div>
+              <div id="alertTitle" style="font-size:13.5px; font-weight:700; color:#101826;"></div>
+              <div id="alertDesc" style="font-size:13px; color:#6B5E33; margin-top:3px; line-height:1.5;"></div>
             </div>
-            <span class="confidence-label">Confiance IA : <strong id="confidenceValue">0%</strong></span>
           </div>
         </div>
 
-        <div class="card radar-card">
-          <div class="card-header">
-            <h3>Détail par catégorie</h3>
+        <!-- TAB: Skills -->
+        <div id="tabSkills" class="tab-content" style="display:none;">
+          <div id="foundSkillsPanel" style="background:#fff; border:1px solid #E1E6EF; border-radius:14px; padding:22px; margin-bottom:16px;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:15px;"><span style="width:9px; height:9px; border-radius:50%; background:#16A34A;"></span><h3 style="font-size:14.5px; font-weight:600; margin:0;">Présent dans votre CV</h3><span id="foundCount" style="font-size:12px; color:#9AA4B2; margin-left:auto;">0 compétences</span></div>
+            <div id="foundKeywords" style="display:flex; flex-wrap:wrap; gap:7px;"></div>
           </div>
-          <div class="chart-container">
-            <canvas id="radarChart"></canvas>
+
+          <div id="missingSkillsPanel" style="background:#fff; border:1px solid #E1E6EF; border-radius:14px; padding:24px; margin-bottom:16px;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;"><span style="width:9px; height:9px; border-radius:50%; background:#E5484D;"></span><h3 style="font-size:15px; font-weight:600; margin:0;">Compétences manquantes — où les ajouter</h3></div>
+            <p style="font-size:13px; color:#5B6678; margin:0 0 16px;">Pour chaque mot-clé attendu par l'offre, voici son contexte et l'endroit du CV où le placer.</p>
+            <div id="missingDetail" style="display:flex; flex-direction:column; gap:10px;"></div>
+          </div>
+
+          <div id="reformulationsPanel" style="background:#fff; border:1px solid #E1E6EF; border-radius:14px; padding:24px;">
+            <h3 style="font-size:15px; font-weight:600; margin:0 0 4px;">Reformulations recommandées</h3>
+            <p style="font-size:13px; color:#5B6678; margin:0 0 18px;">Vos phrases actuelles réécrites pour coller à l'offre. Copiez-les en un clic.</p>
+            <div id="reformulationsList" style="display:flex; flex-direction:column; gap:12px;"></div>
+          </div>
+        </div>
+
+        <!-- TAB: Plan -->
+        <div id="tabPlan" class="tab-content" style="display:none;">
+          <div style="background:#fff; border:1px solid #E1E6EF; border-radius:14px; padding:26px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:14px; flex-wrap:wrap;">
+              <div>
+                <h3 style="font-size:16px; font-weight:600; margin:0 0 2px;">Plan d'action priorisé</h3>
+                <p style="font-size:13px; color:#5B6678; margin:0;">Trié par impact. Cochez : votre score projeté grimpe en direct.</p>
+              </div>
+              <div id="planScoreBox" style="display:flex; align-items:center; gap:12px; background:#F4F8FF; border:1px solid #DCE8FF; border-radius:12px; padding:10px 16px;">
+                <div style="text-align:right;">
+                  <div style="font-size:11px; color:#5B6678; font-weight:500;">Score projeté</div>
+                  <div id="progressLabel" style="font-size:13px; font-weight:600; color:#101826;">0/0 action(s)</div>
+                </div>
+                <div style="display:flex; align-items:baseline; gap:7px;">
+                  <span id="planBaseScore" style="font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:700; color:#9AA4B2;">0</span>
+                  <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M4 10h11M11 5l5 5-5 5" stroke="#16A34A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span id="planProjectedScore" style="font-family:'Space Grotesk',sans-serif; font-size:28px; font-weight:700; color:#16A34A;">0</span>
+                </div>
+              </div>
+            </div>
+            <div id="planProgressBar" style="height:8px; background:#EDF0F5; border-radius:99px; overflow:hidden; margin-bottom:22px;">
+              <div style="height:100%; border-radius:99px; background:linear-gradient(90deg,#2F6BFF,#16A34A); width:0%; transition:width .5s cubic-bezier(.2,.7,.2,1);"></div>
+            </div>
+            <div id="checklistContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
+            <div id="planDoneBox" style="display:none; align-items:center; gap:10px; margin-top:18px; padding:14px 16px; background:#F4FBF6; border-radius:11px;">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 2l6 3v5c0 3.5-2.5 6.5-6 8-3.5-1.5-6-4.5-6-8V5l6-3z" stroke="#16A34A" stroke-width="1.4" stroke-linejoin="round"/><path d="M7.5 10l1.8 1.8L13 8" stroke="#16A34A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span id="planFootnote" style="font-size:13px; color:#15803D; font-weight:500;">Plan terminé — pensez à mettre à jour votre CV puis relancez une analyse.</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="card details-card">
-        <div class="card-header">
-          <h3>Analyse détaillée</h3>
-          <span class="badge badge-ai" id="aiBadge">Analyse locale</span>
-        </div>
-        <div class="details-grid">
-          <div class="detail-item">
-            <h4>
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1.5a7.5 7.5 0 100 15 7.5 7.5 0 000-15zm3.75 5.25l-4.5 4.5-3-3" stroke="#22C55E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Mots-clés trouvés
-            </h4>
-            <div class="keywords found-keywords" id="foundKeywords"></div>
-          </div>
-          <div class="detail-item">
-            <h4>
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1.5a7.5 7.5 0 100 15 7.5 7.5 0 000-15zm3.75 5.25l-4.5 4.5-3-3" stroke="#EF4444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" transform="rotate(45 9 9)"/></svg>
-              Mots-clés manquants
-            </h4>
-            <div class="keywords missing-keywords" id="missingKeywords"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card category-details-card" id="categoryDetailsCard" style="display:none">
-        <div class="card-header">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 0v12h8V4H6zm1 2h6v1H7V6zm0 2h6v1H7V8zm0 2h4v1H7v-1z" fill="currentColor"/></svg>
-          <h3>Détail par catégorie</h3>
-        </div>
-        <div id="categoryDetailsList"></div>
-      </div>
-
-      <div class="card alerts-card" id="alertsCard" style="display:none">
-        <div class="card-header">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 1.5a8.5 8.5 0 100 17 8.5 8.5 0 000-17zm0 3a1 1 0 011 1v5a1 1 0 01-2 0v-5a1 1 0 011-1zm0 9a1 1 0 100 2 1 1 0 000-2z" fill="currentColor"/></svg>
-          <h3>Alertes</h3>
-        </div>
-        <div id="alertsList"></div>
-      </div>
-
-      <div class="card concrete-skills-card accordion-card" id="concreteSkillsCard" style="display:none">
-        <div class="accordion-header card-header" data-accordion="concreteSkillsBody">
-          <div class="accordion-header-left">
-            <h3>Compétences opérationnelles manquantes</h3>
-            <span class="badge badge-count" id="concreteSkillsCount">0</span>
-          </div>
-          <svg class="accordion-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <div class="accordion-body" id="concreteSkillsBody">
-          <p class="card-subtitle">Associe chaque mot-clé manquant à une compétence concrète et mettable en valeur dans ton CV.</p>
-          <div id="concreteSkillsList"></div>
-        </div>
-      </div>
-
-      <div class="card advice-card accordion-card" id="aiAdviceCard" style="display:none">
-        <div class="accordion-header card-header" data-accordion="aiAdviceBody">
-          <div class="accordion-header-left">
-            <h3>Reformulations concrètes</h3>
-            <span class="badge badge-count" id="aiAdviceCount">0</span>
-          </div>
-          <svg class="accordion-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <div class="accordion-body" id="aiAdviceBody">
-          <p class="card-subtitle">Remplace les phrases génériques de ton CV par des formulations percutantes qui répondent exactement à l'offre.</p>
-          <div id="aiAdviceList"></div>
-        </div>
-      </div>
-
-      <div class="card advice-card-local">
-        <div class="card-header">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1.5a7.5 7.5 0 100 15 7.5 7.5 0 000-15zm0 3.75v3.75M9 12h.008" stroke="#6366F1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <h3>Conseils rapides</h3>
-        </div>
-        <ul id="adviceList"></ul>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="container">
-      <p>ApplyFit &mdash; Outil d'aide à la recherche d'emploi</p>
     </div>
-  </footer>
+  </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
