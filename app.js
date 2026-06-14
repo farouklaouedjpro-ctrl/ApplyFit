@@ -558,10 +558,29 @@ function renderHistory(activeIndex) {
     const deleteBtn = el.querySelector('.history-delete');
     deleteBtn.addEventListener('click', e => {
       e.stopPropagation();
+      const wasActive = idx === state.currentHistoryIndex;
       historyData.splice(idx, 1);
       if (historyData.length === 0) {
         $('historyList').innerHTML = '<div style="padding:20px 12px;text-align:center;font-size:13px;color:#5B6678;">Aucune analyse</div>';
+        if (wasActive) {
+          clearInterval(scoreInterval);
+          clearInterval(analyzeInterval);
+          state.analysis = null;
+          state.displayedScore = 0;
+          state.checked = {};
+          state.currentHistoryIndex = -1;
+          showView('input');
+        }
         return;
+      }
+      if (wasActive) {
+        clearInterval(scoreInterval);
+        clearInterval(analyzeInterval);
+        state.analysis = null;
+        state.displayedScore = 0;
+        state.checked = {};
+        state.currentHistoryIndex = -1;
+        showView('input');
       }
       const newIdx = Math.min(idx, historyData.length - 1);
       renderHistory(newIdx);
