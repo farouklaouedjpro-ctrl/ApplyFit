@@ -7,6 +7,7 @@ import analyzeRouter from './routes/analyze.js';
 import atsRouter from './routes/ats.js';
 import logger from './utils/logger.js';
 import requestLogger from './middleware/requestLogger.js';
+import { validateAnalyzeRequest } from './middleware/validation.js';
 import errorHandler, { notFoundHandler } from './middleware/errorHandler.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -47,26 +48,8 @@ setInterval(() => {
   }
 }, RATE_WINDOW);
 
-const MAX_TEXT_LENGTH = 50000;
-
-function validateAnalyzeInput(req, res, next) {
-  const { cvText, offerText } = req.body;
-  if (typeof cvText !== 'string' || typeof offerText !== 'string') {
-    return res.status(400).json({ error: 'CV et offre doivent être du texte.' });
-  }
-  if (!cvText.trim() || !offerText.trim()) {
-    return res.status(400).json({ error: 'CV et offre sont requis.' });
-  }
-  if (cvText.length > MAX_TEXT_LENGTH || offerText.length > MAX_TEXT_LENGTH) {
-    return res.status(400).json({ error: `Texte trop long. Maximum : ${MAX_TEXT_LENGTH} caractères.` });
-  }
-  req.body.cvText = cvText.trim();
-  req.body.offerText = offerText.trim();
-  next();
-}
-
-app.use('/api/analyze', rateLimit, validateAnalyzeInput, analyzeRouter);
-app.use('/api/ats-score', rateLimit, validateAnalyzeInput, atsRouter);
+app.use('/api/analyze', rateLimit, validateAnalyzeRequest, analyzeRouter);
+app.use('/api/ats-score', rateLimit, validateAnalyzeRequest, atsRouter);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' });
