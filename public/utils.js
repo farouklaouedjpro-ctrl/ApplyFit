@@ -42,6 +42,22 @@ export function escapeHtml(str) {
   return div.innerHTML;
 }
 
+export function calculateGlobalScore(categories) {
+  let totalScore = 0,
+    totalWeight = 0;
+  const weights = { technical: 35, experience: 25, soft: 15, education: 15, languages: 5, tools: 5 };
+  for (const [key, cat] of Object.entries(categories)) {
+    const weight = weights[key] || 10;
+    totalScore += cat.score * weight;
+    totalWeight += weight;
+  }
+  if (totalWeight === 0) return 0;
+  const base = Math.round(totalScore / totalWeight);
+  const allMissing = Object.values(categories).reduce((acc, cat) => acc + cat.missing.length, 0);
+  const penalty = Math.max(0, allMissing - 3) * 2;
+  return Math.max(0, Math.min(100, base - penalty));
+}
+
 let toastTimeout = null;
 export function showToast(message, type) {
   const el = $('toast');

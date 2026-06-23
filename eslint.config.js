@@ -20,8 +20,10 @@ export default [
         console: 'readonly',
         alert: 'readonly',
         pdfjsLib: 'readonly',
+        html2pdf: 'readonly',
         FileReader: 'readonly',
         AbortController: 'readonly',
+        process: 'readonly',
       },
     },
     rules: {

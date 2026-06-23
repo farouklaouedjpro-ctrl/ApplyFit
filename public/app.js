@@ -1,6 +1,5 @@
 import { BACKEND_URL, keywordDatabase, analyzeStepLabels } from './data.js';
-import { $, getLevel, deduplicateArray, band, escapeHtml, showToast } from './utils.js';
-import { analyzeKeywords, calculateGlobalScore } from './analysis.js';
+import { $, getLevel, deduplicateArray, band, escapeHtml, showToast, calculateGlobalScore } from './utils.js';
 
 if (typeof pdfjsLib !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -301,7 +300,7 @@ function checkCanAnalyze() {
     btn.disabled = false;
     btn.classList.add('ready');
     hintBox.innerHTML =
-      '<svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 2l6 3v5c0 3.5-2.5 6.5-6 8-3.5-1.5-6-4.5-6-8V5l6-3z" stroke="#5B6678" stroke-width="1.4" stroke-linejoin="round"/></svg>Traitement local et sécurisé · aucun stockage';
+      '<svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 2l6 3v5c0 3.5-2.5 6.5-6 8-3.5-1.5-6-4.5-6-8V5l6-3z" stroke="#5B6678" stroke-width="1.4" stroke-linejoin="round"/></svg>Analyse IA · aucun stockage de vos documents';
     hintBox.style.color = '#5B6678';
   } else {
     btn.disabled = true;
@@ -732,7 +731,6 @@ function enterResults(skipHistorySave) {
           checked: state.checked,
           targetScore: state.targetScore,
           jobTitle: historyEntry?.job || '',
-          analysisSource: state.analysis.analysisSource,
         }),
       );
     } catch {
@@ -775,11 +773,10 @@ function enterResults(skipHistorySave) {
     $('confidenceBar').querySelector('div').style.width = a.confidence + '%';
   }
 
-  // Mode label (IA vs local)
+  // Mode label
   const modeLabel = $('modeLabel');
   if (modeLabel) {
-    modeLabel.textContent =
-      a.analysisSource === 'local' ? 'Analyse locale (IA indisponible)' : 'Analyse IA · Gemini 2.0 Flash';
+    modeLabel.textContent = 'Analyse IA · Gemini 2.0 Flash';
   }
 
   // Verdict
@@ -862,7 +859,6 @@ async function runAnalysis() {
     clearInterval(analyzeInterval);
     renderAnalyzeSteps(analyzeStepLabels.length);
 
-    // Try backend, fallback to local
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 75000);
@@ -873,87 +869,34 @@ async function runAnalysis() {
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
-      if (result.ok) {
-        const data = await result.json();
-        showToast('Analyse IA terminée avec succès.', 'success');
-        processAIResults(data, cv, offer);
-        return;
+
+      if (!result.ok) {
+        const errBody = await result.text().catch(() => '');
+        throw new Error(`HTTP ${result.status}: ${errBody}`);
       }
-    } catch {
-      // fallback to local
+
+      const data = await result.json();
+      showToast('Analyse IA terminée avec succès.', 'success');
+      processAIResults(data, cv, offer);
+    } catch (err) {
+      clearInterval(analyzeInterval);
+      renderAnalyzeSteps(0);
+      showView('input');
+
+      let message = "L'analyse IA est momentanément indisponible. Veuillez réessayer.";
+      if (err.name === 'AbortError' || err.message.includes('Timeout')) {
+        message = "L'analyse a pris trop de temps. Veuillez réessayer avec un CV ou une offre plus courte.";
+      } else if (err.message.includes('429')) {
+        message = 'Trop de demandes. Veuillez patienter quelques minutes.';
+      } else if (err.message.includes('500')) {
+        message = "Le service d'analyse IA a rencontré une erreur. Réessayez dans quelques instants.";
+      } else if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+        message = "Impossible de contacter le serveur d'analyse. Vérifiez votre connexion.";
+      }
+
+      showToast(message, 'error');
+      console.error('Erreur analyse IA:', err);
     }
-
-    showToast(
-      "Analyse IA indisponible — analyse locale effectuée. Vérifiez la configuration OpenCode Go dans backend/.env.",
-      'warning',
-    );
-
-    // Fallback: local analysis
-    const categories = analyzeKeywords(cv, offer);
-    const globalScore = calculateGlobalScore(categories);
-    const allFound = [];
-    const allMissing = [];
-    for (const cat of Object.values(categories)) {
-      allFound.push(...cat.found);
-      allMissing.push(...cat.missing);
-    }
-    const dedupFound = deduplicateArray(allFound);
-    const dedupMissing = deduplicateArray(allMissing);
-
-    const checklist = [];
-    if (dedupMissing.length > 0) {
-      dedupMissing.slice(0, 5).forEach((k, i) => {
-        const priority = [
-          'typescript',
-          'docker',
-          'ci/cd',
-          'postgresql',
-          'tests unitaires',
-          'aws',
-          'graphql',
-          'kubernetes',
-        ].includes(k.toLowerCase())
-          ? 'Haute'
-          : 'Moyenne';
-        checklist.push({ priority, task: `Ajouter ${k} à vos compétences`, pts: Math.max(1, 6 - i) });
-      });
-    }
-    checklist.push({ priority: 'Haute', task: 'Chiffrer vos résultats sur chaque expérience', pts: 5 });
-
-    const missingDetail = dedupMissing.slice(0, 5).map((k) => ({
-      kw: k,
-      inOffer: "Compétence attendue par l'offre",
-      addTo: 'Section Compétences techniques',
-    }));
-
-    state.analysis = {
-      analysisSource: 'local',
-      globalScore,
-      confidence: null,
-      categories: Object.entries(categories).map(([key, cat]) => ({
-        label: cat.label,
-        weight: { technical: 35, experience: 25, soft: 15, education: 15, languages: 5, tools: 5 }[key] || 10,
-        score: cat.score,
-      })),
-      found: dedupFound,
-      missing: dedupMissing,
-      missingDetail,
-      checklist,
-      reformulations: [
-        {
-          cv: 'Expérience professionnelle dans le domaine.',
-          suggestion: 'Concrétisez avec des métriques : "réalisé X projet, traité Y utilisateurs...',
-        },
-        {
-          cv: 'Compétence en développement.',
-          suggestion: 'Précisez la tech stack : "Développement React/Node.js avec API REST"',
-        },
-      ],
-      alerts: [],
-    };
-    state.checked = {};
-    state.targetScore = globalScore;
-    enterResults();
   }, 2200);
 }
 
@@ -1049,7 +992,6 @@ function processAIResults(data) {
   const alerts = (data.alerts || []).slice(0, 3);
 
   state.analysis = {
-    analysisSource: 'ai',
     globalScore,
     confidence: data.confidence,
     categories: categoryDisplay,
@@ -1148,10 +1090,65 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Export PDF button (print)
+    // Export PDF button (download)
     $('exportPdfBtn').addEventListener('click', () => {
       if (!state.analysis) return;
-      window.print();
+      if (typeof html2pdf === 'undefined') {
+        showToast('Générateur PDF indisponible.', 'error');
+        return;
+      }
+
+      const source = $('viewResults');
+      const title = $('resultJobTitle').textContent.trim() || 'ApplyFit-analyse';
+      const safeTitle = title.replace(/[^a-z0-9\u00C0-\u017F_-]+/gi, '-').replace(/^-|-$/g, '');
+
+      const clone = source.cloneNode(true);
+      clone.style.maxWidth = '920px';
+      clone.style.margin = '0';
+      clone.style.padding = '24px';
+      clone.style.background = '#ffffff';
+
+      // Hide action buttons in PDF
+      const shareBtn = clone.querySelector('#shareBtn');
+      const exportBtn = clone.querySelector('#exportPdfBtn');
+      if (shareBtn) shareBtn.style.display = 'none';
+      if (exportBtn) exportBtn.style.display = 'none';
+
+      // Show all tab contents in PDF
+      clone.querySelectorAll('.tab-content').forEach((tab) => {
+        tab.classList.add('active');
+        tab.style.display = 'block';
+        tab.style.marginBottom = '24px';
+      });
+
+      // Hide tab navigation in PDF
+      const tabNav = clone.querySelector('#tabNav');
+      if (tabNav) tabNav.style.display = 'none';
+
+      const wrapper = document.createElement('div');
+      wrapper.style.position = 'fixed';
+      wrapper.style.left = '-9999px';
+      wrapper.style.top = '0';
+      wrapper.appendChild(clone);
+      document.body.appendChild(wrapper);
+
+      const opt = {
+        margin: [10, 10],
+        filename: `${safeTitle || 'ApplyFit-analyse'}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      };
+
+      html2pdf()
+        .set(opt)
+        .from(clone)
+        .save()
+        .then(() => wrapper.remove())
+        .catch(() => {
+          wrapper.remove();
+          showToast('Erreur lors de la génération du PDF.', 'error');
+        });
     });
 
     // Render results

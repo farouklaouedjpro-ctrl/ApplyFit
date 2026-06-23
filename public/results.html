@@ -26,7 +26,11 @@
         </div>
 
         <div class="afb-new" style="padding: 16px 14px 8px">
-          <a href="index.html" class="btn-primary" style="text-decoration:none;display:flex;align-items:center;gap:6px;">
+          <a
+            href="index.html"
+            class="btn-primary"
+            style="text-decoration: none; display: flex; align-items: center; gap: 6px"
+          >
             <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
               <path d="M8 3v10M3 8h10" stroke="#fff" stroke-width="1.8" stroke-linecap="round" />
             </svg>
@@ -59,7 +63,7 @@
         </button>
 
         <!-- VIEW: Results (directly visible, no view-input or view-analyzing) -->
-        <div id="viewResults" class="view-results" style="display:block;">
+        <div id="viewResults" class="view-results" style="display: block">
           <!-- toolbar -->
           <div
             style="
@@ -117,7 +121,7 @@
                     stroke-linejoin="round"
                   />
                 </svg>
-                <span id="modeLabel" class="exec-badge-text">Analyse ApplyFit</span>
+                <span id="modeLabel" class="exec-badge-text">Analyse IA · Gemini 2.0 Flash</span>
               </div>
               <div id="execSummary" class="exec-summary"></div>
             </div>
@@ -131,7 +135,7 @@
               <div id="confidenceBar" class="confidence-bar">
                 <div class="confidence-bar-fill" style="width: 0%"></div>
               </div>
-              <div class="confidence-footnote">Bascule en analyse locale si l'IA est indisponible.</div>
+              <div class="confidence-footnote">Analyse propulsée par l'IA.</div>
             </div>
           </div>
 
@@ -424,6 +428,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script type="module" src="app.js"></script>
     <div id="toast"></div>
   </body>

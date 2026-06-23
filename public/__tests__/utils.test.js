@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { getLevel, tokenize, deduplicateArray, band } from '../utils.js';
+import { getLevel, tokenize, deduplicateArray, band, calculateGlobalScore } from '../utils.js';
 
 describe('getLevel', () => {
   it('retourne "excellent" pour un score >= 80', () => {
@@ -29,7 +29,7 @@ describe('tokenize', () => {
     assert.deepStrictEqual(tokenize('Hello World'), ['hello', 'world']);
   });
 
-  it('ignore les mots d\'un seul caractère', () => {
+  it("ignore les mots d'un seul caractère", () => {
     assert.deepStrictEqual(tokenize('a b c hello'), ['hello']);
   });
 
@@ -88,5 +88,62 @@ describe('band', () => {
     assert.ok(b.color);
     assert.ok(b.bg);
     assert.ok(b.tint);
+  });
+});
+
+describe('calculateGlobalScore', () => {
+  it('calcule un score pondéré', () => {
+    const categories = {
+      technical: { score: 100, found: ['a'], missing: [] },
+      soft: { score: 100, found: [], missing: [] },
+      tools: { score: 100, found: [], missing: [] },
+      education: { score: 100, found: [], missing: [] },
+      languages: { score: 100, found: [], missing: [] },
+      experience: { score: 100, found: [], missing: [] },
+    };
+    assert.strictEqual(calculateGlobalScore(categories), 100);
+  });
+
+  it('applique une pénalité pour les compétences manquantes (> 3)', () => {
+    const categories = {
+      technical: { score: 100, found: ['a'], missing: ['b', 'c', 'd', 'e'] },
+      soft: { score: 100, found: [], missing: [] },
+      tools: { score: 100, found: [], missing: [] },
+      education: { score: 100, found: [], missing: [] },
+      languages: { score: 100, found: [], missing: [] },
+      experience: { score: 100, found: [], missing: [] },
+    };
+    const score = calculateGlobalScore(categories);
+    assert.ok(score < 100);
+    assert.ok(score >= 90);
+  });
+
+  it('retourne 0 pour des catégories vides', () => {
+    assert.strictEqual(calculateGlobalScore({}), 0);
+  });
+
+  it('clampe le score entre 0 et 100', () => {
+    const categories = {
+      technical: { score: 0, found: [], missing: ['a', 'b', 'c', 'd', 'e'] },
+      soft: { score: 0, found: [], missing: [] },
+      tools: { score: 0, found: [], missing: [] },
+      education: { score: 0, found: [], missing: [] },
+      languages: { score: 0, found: [], missing: [] },
+      experience: { score: 0, found: [], missing: [] },
+    };
+    assert.strictEqual(calculateGlobalScore(categories), 0);
+  });
+
+  it('pondère correctement les catégories', () => {
+    const categories = {
+      technical: { score: 100, found: ['a'], missing: [] },
+      soft: { score: 0, found: [], missing: [] },
+      tools: { score: 0, found: [], missing: [] },
+      education: { score: 0, found: [], missing: [] },
+      languages: { score: 0, found: [], missing: [] },
+      experience: { score: 0, found: [], missing: [] },
+    };
+    const score = calculateGlobalScore(categories);
+    assert.strictEqual(score, 35);
   });
 });

@@ -4,6 +4,9 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { analyzeWithAI } from './services/aiService.js';
+import logger from './utils/logger.js';
+import requestLogger from './middleware/requestLogger.js';
+import errorHandler, { notFoundHandler } from './middleware/errorHandler.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -12,6 +15,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3001';
 
 app.use(cors({ origin: FRONTEND_URL }));
 app.use(express.json({ limit: '5mb' }));
+app.use(requestLogger());
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // Rate limiting: max 10 analyses per IP per 5 minutes
@@ -60,7 +64,7 @@ function validateAnalyzeInput(req, res, next) {
   next();
 }
 
-const ANALYZE_TIMEOUT_MS = Number(process.env.ANALYZE_TIMEOUT_MS) || 60000;
+const ANALYZE_TIMEOUT_MS = Number(process.env.ANALYZE_TIMEOUT_MS) || 120000;
 
 app.post('/api/analyze', rateLimit, validateAnalyzeInput, async (req, res) => {
   const { cvText, offerText } = req.body;
@@ -69,9 +73,23 @@ app.post('/api/analyze', rateLimit, validateAnalyzeInput, async (req, res) => {
       setTimeout(() => reject(new Error('Timeout: l\'analyse IA a pris trop de temps')), ANALYZE_TIMEOUT_MS)
     );
     const result = await Promise.race([analyzeWithAI(cvText, offerText), timeoutPromise]);
+    logger.info('Analyse IA terminée avec succès', {
+      context: 'analyze',
+      ip: req.ip || req.connection.remoteAddress,
+      cvTextLength: cvText.length,
+      offerTextLength: offerText.length,
+      globalScore: result.globalScore,
+    });
     res.json(result);
   } catch (err) {
-    console.error('AI analysis error:', err.message);
+    logger.error('Erreur lors de l\'analyse IA', {
+      context: 'analyze',
+      ip: req.ip || req.connection.remoteAddress,
+      cvTextLength: cvText.length,
+      offerTextLength: offerText.length,
+      error: err.message,
+      stack: err.stack,
+    });
     res.status(500).json({ error: 'Erreur analyse IA.' });
   }
 });
@@ -80,6 +98,14 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
 
+app.use(notFoundHandler);
+app.use(errorHandler);
+
 app.listen(PORT, () => {
-  console.log(`ApplyFit backend running on http://localhost:${PORT}`);
+  logger.info(`ApplyFit backend running on http://localhost:${PORT}`, {
+    context: 'startup',
+    port: PORT,
+    env: process.env.NODE_ENV || 'development',
+    analyzeTimeoutMs: ANALYZE_TIMEOUT_MS,
+  });
 });

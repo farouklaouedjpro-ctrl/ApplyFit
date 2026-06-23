@@ -1,4 +1,7 @@
 import { buildAnalysisPrompt } from '../prompts/analyzePrompt.js';
+import { createChildLogger } from '../utils/logger.js';
+
+const logger = createChildLogger('aiService');
 
 const OPENCODE_GO_API_KEY = process.env.OPENCODE_GO_API_KEY || '';
 const OPENCODE_GO_MODEL = process.env.OPENCODE_GO_MODEL || 'kimi-k2.7-code';
@@ -9,7 +12,15 @@ export function parseJSONResponse(text) {
   let cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
   const extracted = cleaned.match(/\{[\s\S]*\}/);
   if (extracted) cleaned = extracted[0];
-  return JSON.parse(cleaned);
+  try {
+    return JSON.parse(cleaned);
+  } catch (err) {
+    logger.warn('Échec du parsing de la réponse JSON', {
+      error: err.message,
+      preview: cleaned.slice(0, 500),
+    });
+    throw err;
+  }
 }
 
 export function validateAnalysisResponse(parsed) {
@@ -79,6 +90,10 @@ export function validateAnalysisResponse(parsed) {
     errors.push('alerts doit être un tableau');
   }
 
+  if (errors.length > 0) {
+    logger.warn('Validation de la réponse IA échouée', { errors });
+  }
+
   return {
     valid: errors.length === 0,
     errors,
@@ -126,27 +141,56 @@ async function queryOpenCodeGo(prompt) {
     body.temperature = Number(OPENCODE_GO_TEMPERATURE);
   }
 
-  const response = await fetch(OPENCODE_GO_API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${OPENCODE_GO_API_KEY}`,
-    },
-    body: JSON.stringify(body),
-  });
+  logger.debug('Appel API OpenCode Go', { model: OPENCODE_GO_MODEL, promptLength: prompt.length });
+  const start = Date.now();
 
-  if (!response.ok) {
-    const errBody = await response.text();
-    throw new Error(`OpenCode Go API error ${response.status}: ${errBody}`);
+  try {
+    const response = await fetch(OPENCODE_GO_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${OPENCODE_GO_API_KEY}`,
+      },
+      body: JSON.stringify(body),
+    });
+
+    const duration = Date.now() - start;
+
+    if (!response.ok) {
+      const errBody = await response.text();
+      logger.error('OpenCode Go API a retourné une erreur', {
+        status: response.status,
+        durationMs: duration,
+        responsePreview: errBody.slice(0, 500),
+      });
+      throw new Error(`OpenCode Go API error ${response.status}: ${errBody}`);
+    }
+
+    const data = await response.json();
+    const text = data.choices?.[0]?.message?.content || '';
+    logger.info('Réponse OpenCode Go reçue', {
+      durationMs: duration,
+      model: OPENCODE_GO_MODEL,
+      responseLength: text.length,
+    });
+
+    if (!text) throw new Error('OpenCode Go: réponse vide');
+    return text;
+  } catch (err) {
+    logger.error('Erreur réseau/API OpenCode Go', {
+      error: err.message,
+      durationMs: Date.now() - start,
+    });
+    throw err;
   }
-
-  const data = await response.json();
-  const text = data.choices?.[0]?.message?.content || '';
-  if (!text) throw new Error('OpenCode Go: réponse vide');
-  return text;
 }
 
 export async function analyzeWithAI(cvText, offerText) {
+  logger.info('Démarrage analyse IA', {
+    cvTextLength: cvText.length,
+    offerTextLength: offerText.length,
+  });
+
   const prompt = buildAnalysisPrompt(cvText, offerText);
   const rawResponse = await queryOpenCodeGo(prompt);
   const parsed = parseJSONResponse(rawResponse);
@@ -194,7 +238,7 @@ export async function analyzeWithAI(cvText, offerText) {
       concreteSkill: mk.concreteSkill || mk.keyword || '',
     }));
 
-  return {
+  const result = {
     globalScore: clampScore(typeof parsed.globalScore === 'number' ? parsed.globalScore : 0),
     confidence: typeof parsed.confidence === 'number' ? clampScore(parsed.confidence) : null,
     categories,
@@ -211,4 +255,13 @@ export async function analyzeWithAI(cvText, offerText) {
       suggestion: a.suggestion || '',
     })),
   };
+
+  logger.info('Analyse IA finalisée', {
+    globalScore: result.globalScore,
+    confidence: result.confidence,
+    categoriesCount: Object.keys(result.categories).length,
+    missingKeywordsCount: result.missingKeywords.length,
+  });
+
+  return result;
 }
