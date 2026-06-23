@@ -65,6 +65,7 @@ const historyData = loadHistory();
 let scoreInterval = null;
 let analyzeInterval = null;
 let copyTimeout = null;
+const modeSetters = {};
 
 // ===== DOM refs =====
 const viewInput = $('viewInput');
@@ -154,6 +155,8 @@ function setupModeToggle(type) {
       pastePanel.style.display = 'block';
     }
   }
+
+  modeSetters[type] = setMode;
 
   fileBtn.addEventListener('click', () => setMode('file'));
   pasteBtn.addEventListener('click', () => setMode('paste'));
@@ -597,7 +600,7 @@ function renderReformulations() {
       <div style="padding:12px 14px;background:#EAF0FF;border-radius:9px;position:relative;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
           <div style="font-size:10.5px;font-weight:700;letter-spacing:.4px;color:#2F6BFF;text-transform:uppercase;">Après</div>
-          <button class="copy-btn${on ? ' copied' : ''}" data-index="${i}" data-text="${escapeHtml(rf.suggestion)}">
+          <button class="copy-btn${on ? ' copied' : ''}" data-index="${i}">
             <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="${on ? copyIconCheck : copyIconCopy}" stroke="${on ? '#16A34A' : '#2F6BFF'}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             ${on ? 'Copié' : 'Copier'}
           </button>
@@ -612,7 +615,7 @@ function renderReformulations() {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const i = parseInt(btn.dataset.index);
-      const text = btn.dataset.text;
+      const text = a.reformulations[i]?.suggestion || '';
       try {
         navigator.clipboard.writeText(text);
       } catch {
@@ -729,6 +732,7 @@ function enterResults(skipHistorySave) {
           checked: state.checked,
           targetScore: state.targetScore,
           jobTitle: historyEntry?.job || '',
+          analysisSource: state.analysis.analysisSource,
         }),
       );
     } catch {
@@ -769,6 +773,13 @@ function enterResults(skipHistorySave) {
   if (a.confidence !== undefined) {
     $('confidenceLabel').textContent = a.confidence + '%';
     $('confidenceBar').querySelector('div').style.width = a.confidence + '%';
+  }
+
+  // Mode label (IA vs local)
+  const modeLabel = $('modeLabel');
+  if (modeLabel) {
+    modeLabel.textContent =
+      a.analysisSource === 'local' ? 'Analyse locale (IA indisponible)' : 'Analyse IA · Gemini 2.0 Flash';
   }
 
   // Verdict
@@ -854,7 +865,7 @@ async function runAnalysis() {
     // Try backend, fallback to local
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 25000);
+      const timeoutId = setTimeout(() => controller.abort(), 75000);
       const result = await fetch(`${BACKEND_URL}/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -873,7 +884,7 @@ async function runAnalysis() {
     }
 
     showToast(
-      "Analyse IA indisponible — analyse locale effectuée. Configurez GEMINI_API_KEY dans backend/.env pour l'analyse IA.",
+      "Analyse IA indisponible — analyse locale effectuée. Vérifiez la configuration OpenCode Go dans backend/.env.",
       'warning',
     );
 
@@ -916,6 +927,7 @@ async function runAnalysis() {
     }));
 
     state.analysis = {
+      analysisSource: 'local',
       globalScore,
       confidence: null,
       categories: Object.entries(categories).map(([key, cat]) => ({
@@ -1037,6 +1049,7 @@ function processAIResults(data) {
   const alerts = (data.alerts || []).slice(0, 3);
 
   state.analysis = {
+    analysisSource: 'ai',
     globalScore,
     confidence: data.confidence,
     categories: categoryDisplay,
@@ -1144,6 +1157,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Render results
     if (state.analysis) {
       enterResults(true);
+    } else {
+      window.location.replace('index.html');
     }
     return;
   }
@@ -1183,8 +1198,8 @@ document.addEventListener('DOMContentLoaded', () => {
     $('offerFileInput').value = '';
     $('cvFileInfo').classList.remove('active');
     $('offerFileInfo').classList.remove('active');
-    setupModeToggle('cv');
-    setupModeToggle('offer');
+    modeSetters.cv?.('file');
+    modeSetters.offer?.('file');
     checkCanAnalyze();
     showView('input');
     window.scrollTo({ top: 0, behavior: 'smooth' });

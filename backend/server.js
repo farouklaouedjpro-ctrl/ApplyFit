@@ -60,11 +60,13 @@ function validateAnalyzeInput(req, res, next) {
   next();
 }
 
+const ANALYZE_TIMEOUT_MS = Number(process.env.ANALYZE_TIMEOUT_MS) || 60000;
+
 app.post('/api/analyze', rateLimit, validateAnalyzeInput, async (req, res) => {
   const { cvText, offerText } = req.body;
   try {
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Timeout: l\'analyse IA a pris trop de temps')), 30000)
+      setTimeout(() => reject(new Error('Timeout: l\'analyse IA a pris trop de temps')), ANALYZE_TIMEOUT_MS)
     );
     const result = await Promise.race([analyzeWithAI(cvText, offerText), timeoutPromise]);
     res.json(result);

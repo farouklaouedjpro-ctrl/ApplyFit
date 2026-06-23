@@ -1,8 +1,9 @@
 import { buildAnalysisPrompt } from '../prompts/analyzePrompt.js';
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+const OPENCODE_GO_API_KEY = process.env.OPENCODE_GO_API_KEY || '';
+const OPENCODE_GO_MODEL = process.env.OPENCODE_GO_MODEL || 'kimi-k2.7-code';
+const OPENCODE_GO_TEMPERATURE = process.env.OPENCODE_GO_TEMPERATURE;
+const OPENCODE_GO_API_URL = 'https://opencode.ai/zen/go/v1/chat/completions';
 
 export function parseJSONResponse(text) {
   let cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
@@ -110,40 +111,49 @@ export function clampScore(value) {
   return Math.max(0, Math.min(100, Math.round(value)));
 }
 
-async function queryGemini(prompt) {
-  const response = await fetch(GEMINI_API_URL, {
+async function queryOpenCodeGo(prompt) {
+  if (!OPENCODE_GO_API_KEY) {
+    throw new Error('Clé API OpenCode Go manquante (OPENCODE_GO_API_KEY)');
+  }
+
+  const body = {
+    model: OPENCODE_GO_MODEL,
+    messages: [{ role: 'user', content: prompt }],
+    max_tokens: 8192,
+  };
+
+  if (OPENCODE_GO_TEMPERATURE !== undefined && OPENCODE_GO_TEMPERATURE !== '') {
+    body.temperature = Number(OPENCODE_GO_TEMPERATURE);
+  }
+
+  const response = await fetch(OPENCODE_GO_API_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_API_KEY },
-    body: JSON.stringify({
-      contents: [{
-        parts: [{ text: prompt }],
-      }],
-      generationConfig: {
-        temperature: 0.1,
-        maxOutputTokens: 4096,
-      },
-    }),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${OPENCODE_GO_API_KEY}`,
+    },
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {
     const errBody = await response.text();
-    throw new Error(`Gemini API error ${response.status}: ${errBody}`);
+    throw new Error(`OpenCode Go API error ${response.status}: ${errBody}`);
   }
 
   const data = await response.json();
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-  if (!text) throw new Error('Gemini: réponse vide');
+  const text = data.choices?.[0]?.message?.content || '';
+  if (!text) throw new Error('OpenCode Go: réponse vide');
   return text;
 }
 
 export async function analyzeWithAI(cvText, offerText) {
   const prompt = buildAnalysisPrompt(cvText, offerText);
-  const rawResponse = await queryGemini(prompt);
+  const rawResponse = await queryOpenCodeGo(prompt);
   const parsed = parseJSONResponse(rawResponse);
 
   const validation = validateAnalysisResponse(parsed);
   if (!validation.valid) {
-    console.warn('Validation de la réponse Gemini échouée:', validation.errors);
+    throw new Error('Validation de la réponse OpenCode Go échouée: ' + validation.errors.join('; '));
   }
 
   const defaultCategories = {
