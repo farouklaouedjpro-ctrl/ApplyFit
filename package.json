@@ -1,0 +1,17 @@
+{
+  "name": "applyfit",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "eslint public/*.js",
+    "lint:fix": "eslint public/*.js --fix",
+    "format": "prettier --write public/**/*.{js,css,html}",
+    "format:check": "prettier --check public/**/*.{js,css,html}",
+    "test": "node --test public/__tests__/*.test.js"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.5.0",
+    "prettier": "^3.8.4"
+  }
+}

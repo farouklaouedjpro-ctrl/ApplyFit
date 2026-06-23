@@ -2,16 +2,16 @@ import { buildAnalysisPrompt } from '../prompts/analyzePrompt.js';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
-function parseJSONResponse(text) {
+export function parseJSONResponse(text) {
   let cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
   const extracted = cleaned.match(/\{[\s\S]*\}/);
   if (extracted) cleaned = extracted[0];
   return JSON.parse(cleaned);
 }
 
-function validateAnalysisResponse(parsed) {
+export function validateAnalysisResponse(parsed) {
   const errors = [];
 
   if (typeof parsed.globalScore !== 'number' || parsed.globalScore < 0 || parsed.globalScore > 100) {
@@ -84,7 +84,7 @@ function validateAnalysisResponse(parsed) {
   };
 }
 
-function hasDuplicates(arr) {
+export function hasDuplicates(arr) {
   if (!Array.isArray(arr)) return false;
   const seen = new Set();
   for (const item of arr) {
@@ -95,7 +95,7 @@ function hasDuplicates(arr) {
   return false;
 }
 
-function deduplicate(arr) {
+export function deduplicate(arr) {
   if (!Array.isArray(arr)) return [];
   const seen = new Set();
   return arr.filter(item => {
@@ -106,14 +106,14 @@ function deduplicate(arr) {
   });
 }
 
-function clampScore(value) {
+export function clampScore(value) {
   return Math.max(0, Math.min(100, Math.round(value)));
 }
 
 async function queryGemini(prompt) {
   const response = await fetch(GEMINI_API_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_API_KEY },
     body: JSON.stringify({
       contents: [{
         parts: [{ text: prompt }],
