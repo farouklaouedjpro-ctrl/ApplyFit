@@ -1,6 +1,6 @@
 import { buildATSPrompt } from '../prompts/atsPrompt.js';
 import { queryOpenCodeGo } from './aiClient.js';
-import { parseJSONResponse, clampScore } from './aiService.js';
+import { parseJSONResponse, clampScore } from '../utils/aiHelpers.js';
 import { createChildLogger } from '../utils/logger.js';
 
 const logger = createChildLogger('atsService');

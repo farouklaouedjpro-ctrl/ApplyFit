@@ -2,11 +2,11 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   parseJSONResponse,
-  validateAnalysisResponse,
   hasDuplicates,
   deduplicate,
   clampScore,
-} from '../services/aiService.js';
+} from '../utils/aiHelpers.js';
+import { validateAnalysisResponse } from '../services/aiService.js';
 
 describe('parseJSONResponse', () => {
   it('parse un JSON simple', () => {
