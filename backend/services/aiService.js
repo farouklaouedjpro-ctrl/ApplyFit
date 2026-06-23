@@ -1,12 +1,8 @@
 import { buildAnalysisPrompt } from '../prompts/analyzePrompt.js';
 import { createChildLogger } from '../utils/logger.js';
+import { queryOpenCodeGo } from './aiClient.js';
 
 const logger = createChildLogger('aiService');
-
-const OPENCODE_GO_API_KEY = process.env.OPENCODE_GO_API_KEY || '';
-const OPENCODE_GO_MODEL = process.env.OPENCODE_GO_MODEL || 'kimi-k2.7-code';
-const OPENCODE_GO_TEMPERATURE = process.env.OPENCODE_GO_TEMPERATURE;
-const OPENCODE_GO_API_URL = 'https://opencode.ai/zen/go/v1/chat/completions';
 
 export function parseJSONResponse(text) {
   let cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
@@ -124,65 +120,6 @@ export function deduplicate(arr) {
 
 export function clampScore(value) {
   return Math.max(0, Math.min(100, Math.round(value)));
-}
-
-async function queryOpenCodeGo(prompt) {
-  if (!OPENCODE_GO_API_KEY) {
-    throw new Error('Clé API OpenCode Go manquante (OPENCODE_GO_API_KEY)');
-  }
-
-  const body = {
-    model: OPENCODE_GO_MODEL,
-    messages: [{ role: 'user', content: prompt }],
-    max_tokens: 8192,
-  };
-
-  if (OPENCODE_GO_TEMPERATURE !== undefined && OPENCODE_GO_TEMPERATURE !== '') {
-    body.temperature = Number(OPENCODE_GO_TEMPERATURE);
-  }
-
-  logger.debug('Appel API OpenCode Go', { model: OPENCODE_GO_MODEL, promptLength: prompt.length });
-  const start = Date.now();
-
-  try {
-    const response = await fetch(OPENCODE_GO_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENCODE_GO_API_KEY}`,
-      },
-      body: JSON.stringify(body),
-    });
-
-    const duration = Date.now() - start;
-
-    if (!response.ok) {
-      const errBody = await response.text();
-      logger.error('OpenCode Go API a retourné une erreur', {
-        status: response.status,
-        durationMs: duration,
-        responsePreview: errBody.slice(0, 500),
-      });
-      throw new Error(`OpenCode Go API error ${response.status}: ${errBody}`);
-    }
-
-    const data = await response.json();
-    const text = data.choices?.[0]?.message?.content || '';
-    logger.info('Réponse OpenCode Go reçue', {
-      durationMs: duration,
-      model: OPENCODE_GO_MODEL,
-      responseLength: text.length,
-    });
-
-    if (!text) throw new Error('OpenCode Go: réponse vide');
-    return text;
-  } catch (err) {
-    logger.error('Erreur réseau/API OpenCode Go', {
-      error: err.message,
-      durationMs: Date.now() - start,
-    });
-    throw err;
-  }
 }
 
 export async function analyzeWithAI(cvText, offerText) {
