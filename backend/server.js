@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import analyzeRouter from './routes/analyze.js';
 import atsRouter from './routes/ats.js';
 import logger from './utils/logger.js';
@@ -40,14 +40,6 @@ function rateLimit(req, res, next) {
   next();
 }
 
-// Cleanup old entries every 5 minutes
-setInterval(() => {
-  const now = Date.now();
-  for (const [ip, entry] of rateLimitMap) {
-    if (now - entry.start > RATE_WINDOW) rateLimitMap.delete(ip);
-  }
-}, RATE_WINDOW);
-
 app.use('/api/analyze', rateLimit, validateAnalyzeRequest, analyzeRouter);
 app.use('/api/ats-score', rateLimit, validateAnalyzeRequest, atsRouter);
 
@@ -58,10 +50,21 @@ app.get('/api/health', (_req, res) => {
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  logger.info(`ApplyFit backend running on http://localhost:${PORT}`, {
-    context: 'startup',
-    port: PORT,
-    env: process.env.NODE_ENV || 'development',
+export default app;
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  setInterval(() => {
+    const now = Date.now();
+    for (const [ip, entry] of rateLimitMap) {
+      if (now - entry.start > RATE_WINDOW) rateLimitMap.delete(ip);
+    }
+  }, RATE_WINDOW);
+
+  app.listen(PORT, () => {
+    logger.info(`ApplyFit backend running on http://localhost:${PORT}`, {
+      context: 'startup',
+      port: PORT,
+      env: process.env.NODE_ENV || 'development',
+    });
   });
-});
+}

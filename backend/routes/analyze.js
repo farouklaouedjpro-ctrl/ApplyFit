@@ -7,11 +7,13 @@ const ANALYZE_TIMEOUT_MS = Number(process.env.ANALYZE_TIMEOUT_MS) || 120000;
 
 router.post('/', async (req, res) => {
   const { cvText, offerText } = req.body;
+  let timeoutId;
   try {
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("Timeout: l'analyse IA a pris trop de temps")), ANALYZE_TIMEOUT_MS)
-    );
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutId = setTimeout(() => reject(new Error("Timeout: l'analyse IA a pris trop de temps")), ANALYZE_TIMEOUT_MS);
+    });
     const result = await Promise.race([analyzeWithAI(cvText, offerText), timeoutPromise]);
+    clearTimeout(timeoutId);
     logger.info('Analyse IA terminée avec succès', {
       context: 'analyze',
       ip: req.ip || req.connection.remoteAddress,
@@ -21,6 +23,7 @@ router.post('/', async (req, res) => {
     });
     res.json(result);
   } catch (err) {
+    clearTimeout(timeoutId);
     logger.error('Erreur lors de l\'analyse IA', {
       context: 'analyze',
       ip: req.ip || req.connection.remoteAddress,

@@ -7,11 +7,13 @@ const ATS_TIMEOUT_MS = Number(process.env.ATS_TIMEOUT_MS) || 120000;
 
 router.post('/', async (req, res) => {
   const { cvText, offerText } = req.body;
+  let timeoutId;
   try {
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("Timeout: l'analyse ATS a pris trop de temps")), ATS_TIMEOUT_MS)
-    );
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutId = setTimeout(() => reject(new Error("Timeout: l'analyse ATS a pris trop de temps")), ATS_TIMEOUT_MS);
+    });
     const result = await Promise.race([analyzeATS(cvText, offerText), timeoutPromise]);
+    clearTimeout(timeoutId);
     logger.info('Analyse ATS terminée avec succès', {
       context: 'ats-score',
       ip: req.ip || req.connection.remoteAddress,
@@ -22,6 +24,7 @@ router.post('/', async (req, res) => {
     });
     res.json(result);
   } catch (err) {
+    clearTimeout(timeoutId);
     logger.error('Erreur lors de l analyse ATS', {
       context: 'ats-score',
       ip: req.ip || req.connection.remoteAddress,

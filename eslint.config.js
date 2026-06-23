@@ -34,4 +34,14 @@ export default [
       'prefer-const': 'warn',
     },
   },
+  {
+    files: ['backend/**/*.js'],
+    languageOptions: {
+      globals: {
+        global: 'readonly',
+        Buffer: 'readonly',
+        URL: 'readonly',
+      },
+    },
+  },
 ];

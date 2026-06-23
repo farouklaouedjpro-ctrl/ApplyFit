@@ -8,7 +8,9 @@ export const OPENCODE_GO_API_KEY = process.env.OPENCODE_GO_API_KEY || '';
 export const OPENCODE_GO_MODEL = process.env.OPENCODE_GO_MODEL || 'kimi-k2.7-code';
 export const OPENCODE_GO_TEMPERATURE = process.env.OPENCODE_GO_TEMPERATURE;
 export const OPENCODE_GO_TIMEOUT_MS = Number(process.env.OPENCODE_GO_TIMEOUT_MS) || 120000;
-export const OPENCODE_GO_MAX_RETRIES = Number(process.env.OPENCODE_GO_MAX_RETRIES) || 2;
+export const OPENCODE_GO_MAX_RETRIES = Number.isNaN(Number(process.env.OPENCODE_GO_MAX_RETRIES))
+  ? 2
+  : Number(process.env.OPENCODE_GO_MAX_RETRIES);
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
