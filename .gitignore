@@ -3,4 +3,7 @@ node_modules/
 /backend/.env
 /backend/logs/*.log
 /backend/logs/*.gz
+/backend/logs/*.json
 !/backend/logs/.gitkeep
+dist/
+.omo/

@@ -18,7 +18,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3001';
 app.use(cors({ origin: FRONTEND_URL }));
 app.use(express.json({ limit: '5mb' }));
 app.use(requestLogger());
-app.use(express.static(path.join(__dirname, '..', 'public')));
+app.use(express.static(path.join(__dirname, '..', 'dist')));
 
 // Rate limiting: max 10 analyses per IP per 5 minutes
 const rateLimitMap = new Map();
