@@ -1074,7 +1074,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Tab switching
-    document.querySelectorAll('.tab-btn').forEach((btn) => {
+    document.querySelectorAll('.tab-card').forEach((btn) => {
       btn.addEventListener('click', () => switchTab(btn.id.replace('Btn', '').replace('tab', '').toLowerCase()));
     });
 
