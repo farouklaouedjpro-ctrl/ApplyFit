@@ -26,23 +26,23 @@ export function renderATS() {
 
   const ats = state.ats;
   if (!ats || (!ats.score && !ats.error)) {
-    loading.style.display = 'block';
-    resultPanel.style.display = 'none';
-    errorPanel.style.display = 'none';
+    loading.classList.remove('is-hidden');
+    resultPanel.classList.add('is-hidden');
+    errorPanel.classList.add('is-hidden');
     return;
   }
 
-  loading.style.display = 'none';
+  loading.classList.add('is-hidden');
 
   if (ats.error) {
-    resultPanel.style.display = 'none';
-    errorPanel.style.display = 'flex';
+    resultPanel.classList.add('is-hidden');
+    errorPanel.classList.remove('is-hidden');
     $('atsErrorMsg').textContent = ats.message || "L'analyse ATS est indisponible.";
     return;
   }
 
-  errorPanel.style.display = 'none';
-  resultPanel.style.display = 'block';
+  errorPanel.classList.add('is-hidden');
+  resultPanel.classList.remove('is-hidden');
 
   const b = band(ats.score);
   const verdict = ats.verdict || getAtsVerdict(ats.score);
@@ -58,18 +58,18 @@ export function renderATS() {
   if (Array.isArray(ats.criteria)) {
     ats.criteria.forEach((c) => {
       const row = document.createElement('div');
-      row.style.cssText =
-        'display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:10px;background:#f8f9fb';
+      row.className = 'ats-criterion-row';
       const status = document.createElement('span');
-      status.style.cssText = `flex-shrink:0;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;background:${c.passed ? '#16A34A' : '#E5484D'}`;
+      status.className = 'ats-criterion-status';
+      status.style.background = c.passed ? '#16A34A' : '#E5484D';
       status.textContent = c.passed ? 'OK' : 'KO';
       const body = document.createElement('div');
-      body.style.cssText = 'flex:1;min-width:0';
+      body.className = 'ats-criterion-body';
       const title = document.createElement('div');
-      title.style.cssText = 'font-size:13px;font-weight:600;color:#101826';
+      title.className = 'ats-criterion-name';
       title.textContent = c.name;
       const comment = document.createElement('div');
-      comment.style.cssText = 'font-size:12.5px;color:#6b7689;line-height:1.45;margin-top:2px';
+      comment.className = 'ats-criterion-comment';
       comment.textContent = c.comment;
       body.appendChild(title);
       body.appendChild(comment);
@@ -84,7 +84,6 @@ export function renderATS() {
   if (Array.isArray(ats.recommendations)) {
     ats.recommendations.forEach((r) => {
       const li = document.createElement('li');
-      li.style.marginBottom = '6px';
       li.textContent = r;
       recContainer.appendChild(li);
     });

@@ -7,3 +7,7 @@ node_modules/
 !/backend/logs/.gitkeep
 dist/
 .omo/
+.qa-screenshots/
+.playwright-mcp/
+applyfit-home.png
+ats-tab-qa.png

@@ -47,16 +47,15 @@ export function renderCategories() {
   a.categories.forEach((cat) => {
     const cb = band(cat.score);
     const div = document.createElement('div');
-    div.className = 'kpi-card';
-    div.style.cssText = 'padding:14px;';
+    div.className = 'kpi-card category-card';
     div.innerHTML = `
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;">
-        <span style="font-size:13px;font-weight:600;">${escapeHtml(cat.label)}</span>
-        <span class="tab-badge inactive" style="font-size:10.5px;">${cat.weight}%</span>
+      <div class="category-card-header">
+        <span class="category-card-label">${escapeHtml(cat.label)}</span>
+        <span class="tab-badge inactive category-card-weight">${cat.weight}%</span>
       </div>
-      <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:8px;">
-        <span class="font-grotesk" style="font-size:22px;font-weight:700;color:${cb.color};">${cat.score}</span>
-        <span class="text-light" style="font-size:12px;font-weight:600;">/100</span>
+      <div class="category-card-score">
+        <span class="category-card-score-value" style="color:${cb.color};">${cat.score}</span>
+        <span class="text-light category-card-score-total">/100</span>
       </div>
       <div class="category-bar">
         <div class="category-bar-fill" style="background:${cb.color};width:${cat.score}%;"></div>

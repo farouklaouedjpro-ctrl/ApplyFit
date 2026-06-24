@@ -16,7 +16,7 @@
     <div id="app">
       <!-- ============ SIDEBAR ============ -->
       <div id="sidebarOverlay" class="sidebar-overlay"></div>
-      <aside id="sidebar">
+      <aside id="sidebar" aria-label="Navigation">
         <div class="sidebar-header">
           <div class="sidebar-logo">A</div>
           <div>
@@ -26,8 +26,8 @@
         </div>
 
         <div class="afb-new">
-          <button id="newAnalysisBtn" class="btn-primary">
-            <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+          <button id="newAnalysisBtn" class="btn-primary" type="button">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path d="M8 3v10M3 8h10" stroke="#fff" stroke-width="1.8" stroke-linecap="round" />
             </svg>
             Nouvelle analyse
@@ -35,7 +35,7 @@
         </div>
 
         <div class="afb-hide-mobile sidebar-section-title">Historique</div>
-        <div id="historyList" class="afb-hide-mobile sidebar-history"></div>
+        <div id="historyList" class="afb-hide-mobile sidebar-history" aria-label="Historique des analyses"></div>
 
         <div class="afb-hide-mobile sidebar-user">
           <div class="icon-circle sidebar-user-avatar">U</div>
@@ -43,7 +43,7 @@
             <div class="sidebar-user-name">Utilisateur</div>
             <div class="sidebar-user-plan">Plan gratuit</div>
           </div>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path d="M6 4l4 4-4 4" stroke="#6B7689" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </div>
@@ -52,19 +52,20 @@
       <!-- ============ MAIN ============ -->
       <div class="main-content">
         <!-- Mobile hamburger -->
-        <button id="hamburgerBtn" class="hamburger-btn">
-          <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+        <button id="hamburgerBtn" class="hamburger-btn" type="button" aria-label="Ouvrir le menu">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
             <path d="M3 5h14M3 10h14M3 15h14" stroke="#101826" stroke-width="1.8" stroke-linecap="round" />
           </svg>
         </button>
 
         <!-- VIEW: Input -->
         <div id="viewInput" class="view-input">
-          <div style="margin-bottom: 24px">
+          <!-- Hero -->
+          <div class="hero-section">
             <div class="section-label">Nouvelle analyse</div>
-            <h1 class="section-title">Comparez votre CV à l'offre</h1>
+            <h1 class="section-title">Comparez votre CV a l'offre</h1>
             <p class="section-desc">
-              Importez les deux documents. Le moteur calcule un score pondéré et un plan d'action.
+              Importez les deux documents. Le moteur calcule un score pondere et un plan d'action personnalise.
             </p>
           </div>
 
@@ -74,7 +75,7 @@
               <div class="panel-header">
                 <div class="panel-title">
                   <div class="icon-box icon-box-blue">
-                    <svg width="17" height="17" viewBox="0 0 20 20" fill="none">
+                    <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                       <path
                         d="M5 3a1 1 0 011-1h6l4 4v11a1 1 0 01-1 1H6a1 1 0 01-1-1V3z"
                         stroke="#2F6BFF"
@@ -86,23 +87,23 @@
                   </div>
                   <span class="panel-title-text">Votre CV</span>
                 </div>
-                <div id="cvSegments" class="segments">
-                  <button id="cvFileMode" class="seg-btn active">Importer</button>
-                  <button id="cvPasteMode" class="seg-btn">Coller</button>
+                <div id="cvSegments" class="segments" role="group" aria-label="Mode de saisie du CV">
+                  <button id="cvFileMode" class="seg-btn active" type="button">Importer</button>
+                  <button id="cvPasteMode" class="seg-btn" type="button">Coller</button>
                 </div>
               </div>
 
               <div id="cvFilePanel">
                 <div id="cvFileInfo" class="file-info">
                   <div class="icon-box icon-box-blue">
-                    <svg width="17" height="17" viewBox="0 0 20 20" fill="none">
+                    <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                       <path d="M5 3a1 1 0 011-1h6l4 4v11a1 1 0 01-1 1H6a1 1 0 01-1-1V3z" fill="#2F6BFF" opacity=".22" />
                     </svg>
                   </div>
-                  <div style="flex: 1; min-width: 0">
+                  <div class="flex-1-min-0">
                     <div id="cvFileName" class="file-name"></div>
                     <div id="cvFileStatus" class="file-status">
-                      <svg width="11" height="11" viewBox="0 0 16 16" fill="none">
+                      <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                         <path
                           d="M4 8.5l2.5 2.5 5-6"
                           stroke="#16A34A"
@@ -110,18 +111,30 @@
                           stroke-linecap="round"
                           stroke-linejoin="round"
                         /></svg
-                      >Importé
+                      >Importe
                     </div>
                   </div>
-                  <button id="cvRemoveFile" class="btn-icon-sm" title="Retirer le fichier">
-                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                  <button
+                    id="cvRemoveFile"
+                    class="btn-icon-sm"
+                    type="button"
+                    title="Retirer le fichier"
+                    aria-label="Retirer le fichier"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                       <path d="M4 4l8 8M12 4l-8 8" stroke="#9AA4B2" stroke-width="1.7" stroke-linecap="round" />
                     </svg>
                   </button>
                 </div>
-                <div id="cvDropZone" class="drop-zone">
+                <div
+                  id="cvDropZone"
+                  class="drop-zone"
+                  role="button"
+                  tabindex="0"
+                  aria-label="Deposer votre CV ou cliquer pour parcourir"
+                >
                   <div class="icon-box-lg icon-box-blue">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path
                         d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"
                         stroke="#2F6BFF"
@@ -140,16 +153,17 @@
                   <div class="drop-zone-label">Glissez votre CV ici</div>
                   <div class="drop-zone-sub">ou cliquez pour parcourir</div>
                   <span class="btn-browse">Parcourir</span>
-                  <div class="drop-zone-hint">PDF ou TXT — 5 Mo max</div>
+                  <div class="drop-zone-hint">PDF ou TXT &mdash; 5 Mo max</div>
                 </div>
-                <input type="file" id="cvFileInput" accept=".txt,.pdf" class="is-hidden" />
+                <input type="file" id="cvFileInput" accept=".txt,.pdf" class="is-hidden" aria-label="Fichier CV" />
               </div>
               <div id="cvPastePanel" class="is-hidden">
+                <label for="cvText" class="is-hidden">Contenu du CV</label>
                 <textarea
                   id="cvText"
                   class="textarea"
                   rows="7"
-                  placeholder="Collez ici le contenu de votre CV…"
+                  placeholder="Collez ici le contenu de votre CV&hellip;"
                 ></textarea>
               </div>
             </div>
@@ -159,30 +173,30 @@
               <div class="panel-header">
                 <div class="panel-title">
                   <div class="icon-box icon-box-orange">
-                    <svg width="17" height="17" viewBox="0 0 20 20" fill="none">
+                    <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                       <rect x="3" y="6" width="14" height="11" rx="1.5" stroke="#D98A00" stroke-width="1.5" />
                       <path d="M7 6V5a2 2 0 012-2h2a2 2 0 012 2v1" stroke="#D98A00" stroke-width="1.5" />
                     </svg>
                   </div>
                   <span class="panel-title-text">Offre d'emploi</span>
                 </div>
-                <div id="offerSegments" class="segments">
-                  <button id="offerFileMode" class="seg-btn active">Importer</button>
-                  <button id="offerPasteMode" class="seg-btn">Coller</button>
+                <div id="offerSegments" class="segments" role="group" aria-label="Mode de saisie de l'offre">
+                  <button id="offerFileMode" class="seg-btn active" type="button">Importer</button>
+                  <button id="offerPasteMode" class="seg-btn" type="button">Coller</button>
                 </div>
               </div>
 
               <div id="offerFilePanel">
                 <div id="offerFileInfo" class="file-info">
                   <div class="icon-box icon-box-orange">
-                    <svg width="17" height="17" viewBox="0 0 20 20" fill="none">
+                    <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                       <path d="M5 3a1 1 0 011-1h6l4 4v11a1 1 0 01-1 1H6a1 1 0 01-1-1V3z" fill="#D98A00" opacity=".22" />
                     </svg>
                   </div>
-                  <div style="flex: 1; min-width: 0">
+                  <div class="flex-1-min-0">
                     <div id="offerFileName" class="file-name"></div>
                     <div id="offerFileStatus" class="file-status">
-                      <svg width="11" height="11" viewBox="0 0 16 16" fill="none">
+                      <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                         <path
                           d="M4 8.5l2.5 2.5 5-6"
                           stroke="#16A34A"
@@ -190,18 +204,30 @@
                           stroke-linecap="round"
                           stroke-linejoin="round"
                         /></svg
-                      >Importé
+                      >Importe
                     </div>
                   </div>
-                  <button id="offerRemoveFile" class="btn-icon-sm" title="Retirer le fichier">
-                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                  <button
+                    id="offerRemoveFile"
+                    class="btn-icon-sm"
+                    type="button"
+                    title="Retirer le fichier"
+                    aria-label="Retirer le fichier"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                       <path d="M4 4l8 8M12 4l-8 8" stroke="#9AA4B2" stroke-width="1.7" stroke-linecap="round" />
                     </svg>
                   </button>
                 </div>
-                <div id="offerDropZone" class="drop-zone">
+                <div
+                  id="offerDropZone"
+                  class="drop-zone"
+                  role="button"
+                  tabindex="0"
+                  aria-label="Deposer l'offre ou cliquer pour parcourir"
+                >
                   <div class="icon-box-lg icon-box-orange">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path
                         d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"
                         stroke="#D98A00"
@@ -220,16 +246,23 @@
                   <div class="drop-zone-label">Glissez l'offre ici</div>
                   <div class="drop-zone-sub">ou cliquez pour parcourir</div>
                   <span class="btn-browse">Parcourir</span>
-                  <div class="drop-zone-hint">PDF ou TXT — 5 Mo max</div>
+                  <div class="drop-zone-hint">PDF ou TXT &mdash; 5 Mo max</div>
                 </div>
-                <input type="file" id="offerFileInput" accept=".txt,.pdf" class="is-hidden" />
+                <input
+                  type="file"
+                  id="offerFileInput"
+                  accept=".txt,.pdf"
+                  class="is-hidden"
+                  aria-label="Fichier offre d'emploi"
+                />
               </div>
               <div id="offerPastePanel" class="is-hidden">
+                <label for="offerText" class="is-hidden">Contenu de l'offre</label>
                 <textarea
                   id="offerText"
                   class="textarea"
                   rows="7"
-                  placeholder="Collez ici le contenu de l'offre…"
+                  placeholder="Collez ici le contenu de l'offre&hellip;"
                 ></textarea>
               </div>
             </div>
@@ -237,7 +270,7 @@
 
           <div class="band">
             <div id="hintBox" class="hint-box">
-              <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                 <path
                   d="M10 2l6 3v5c0 3.5-2.5 6.5-6 8-3.5-1.5-6-4.5-6-8V5l6-3z"
                   stroke="#9AA4B2"
@@ -245,11 +278,11 @@
                   stroke-linejoin="round"
                 />
               </svg>
-              Traitement local et sécurisé · aucun stockage
+              Traitement local et securise &middot; aucun stockage
             </div>
-            <button id="analyzeBtn" class="btn-analyze" disabled>
+            <button id="analyzeBtn" class="btn-analyze" type="button" disabled>
               Lancer l'analyse
-              <svg width="17" height="17" viewBox="0 0 20 20" fill="none">
+              <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                 <path
                   d="M4 10h11M11 5l5 5-5 5"
                   stroke="#fff"
@@ -271,7 +304,7 @@
             <div class="afb-bar"></div>
           </div>
           <h2 class="font-grotesk analyze-title">Analyse en cours</h2>
-          <p class="text-muted analyze-subtitle">Extraction et mise en correspondance des compétences</p>
+          <p class="text-muted analyze-subtitle">Extraction et mise en correspondance des competences</p>
           <div id="analyzeSteps" class="analyze-steps"></div>
         </div>
       </div>
@@ -279,6 +312,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script type="module" src="/src/app.js"></script>
-    <div id="toast"></div>
+    <div id="toast" role="alert" aria-live="polite"></div>
   </body>
 </html>

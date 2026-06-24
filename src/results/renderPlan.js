@@ -13,8 +13,7 @@ export function renderChecklist() {
   $('kpiProjected').textContent = projected;
   const delta = realized > 0 ? '+' + realized + ' pts' : 'à activer';
   $('deltaLabel').textContent = delta;
-  $('deltaLabel').style.background = realized > 0 ? 'rgba(127,208,166,.2)' : 'rgba(255,255,255,.1)';
-  $('deltaLabel').style.color = realized > 0 ? '#7FD0A6' : '#9AA4B2';
+  $('deltaLabel').className = 'delta-label ' + (realized > 0 ? 'delta-label-success' : 'delta-label-muted');
 
   const r = 78;
   const circ = 2 * Math.PI * r;
@@ -28,8 +27,7 @@ export function renderChecklist() {
   projCard.querySelector('div:last-child').textContent = projected;
   $('projHint').textContent =
     realized > 0 ? '+' + realized + ' pts gagnés sur ' + totalPts : "jusqu'à +" + totalPts + ' pts · cochez le plan';
-  projCard.style.background = realized > 0 ? '#F1FBF5' : '#F7FAFC';
-  projCard.style.borderColor = realized > 0 ? '#BFE6CD' : '#DCE3EC';
+  projCard.className = 'kpi-card ' + (realized > 0 ? 'proj-card-success' : 'proj-card-default');
 
   $('planBaseScore').textContent = a.globalScore;
   $('planProjectedScore').textContent = projected;
@@ -48,13 +46,13 @@ export function renderChecklist() {
     .map((item, i) => {
       const on = !!state.checked[i];
       const p = prioStyles[item.priority] || prioStyles['Basse'];
-      return `<div class="checklist-item" data-index="${i}" style="border:1px solid ${on ? '#CDEBD6' : '#EDF0F5'};background:${on ? '#F4FBF6' : '#fff'};">
-      <div style="width:24px;height:24px;border-radius:7px;border:2px solid ${on ? '#16A34A' : '#C5CDDA'};background:${on ? '#16A34A' : '#fff'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-        <span style="opacity:${on ? '1' : '0'};display:flex;"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4 8.5l2.5 2.5 5-6" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      return `<div class="checklist-item ${on ? 'checklist-item-done' : ''}" data-index="${i}">
+      <div class="checklist-checkbox">
+        <span class="checklist-check"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4 8.5l2.5 2.5 5-6" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </div>
       <span class="prio-badge" style="background:${p.bg};color:${p.color};">${item.priority}</span>
-      <span style="flex:1;font-size:14px;font-weight:500;opacity:${on ? '.5' : '1'};text-decoration:${on ? 'line-through' : 'none'};">${escapeHtml(item.task)}</span>
-      <span style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:${on ? '#9AA4B2' : '#16A34A'};">+${item.pts} pts</span>
+      <span class="checklist-task">${escapeHtml(item.task)}</span>
+      <span class="checklist-points">+${item.pts} pts</span>
     </div>`;
     })
     .join('');
