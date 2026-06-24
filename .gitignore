@@ -11,3 +11,5 @@ dist/
 .playwright-mcp/
 applyfit-home.png
 ats-tab-qa.png
+.DS_Store
+lighthouse/
