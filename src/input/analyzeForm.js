@@ -14,15 +14,17 @@ export function checkCanAnalyze() {
   if (cvOk && offerOk) {
     btn.disabled = false;
     btn.classList.add('ready');
+    hintBox.classList.remove('hint-box--invalid');
+    hintBox.classList.add('hint-box--valid');
     hintBox.innerHTML =
       '<svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 2l6 3v5c0 3.5-2.5 6.5-6 8-3.5-1.5-6-4.5-6-8V5l6-3z" stroke="#5B6678" stroke-width="1.4" stroke-linejoin="round"/></svg>Analyse IA · aucun stockage de vos documents';
-    hintBox.style.color = '#5B6678';
   } else {
     btn.disabled = true;
     btn.classList.remove('ready');
+    hintBox.classList.remove('hint-box--valid');
+    hintBox.classList.add('hint-box--invalid');
     hintBox.innerHTML =
       '<svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 2l6 3v5c0 3.5-2.5 6.5-6 8-3.5-1.5-6-4.5-6-8V5l6-3z" stroke="#C0322E" stroke-width="1.4" stroke-linejoin="round"/></svg>Ajoutez votre CV et l\'offre pour lancer l\'analyse';
-    hintBox.style.color = '#C0322E';
   }
 }
 
@@ -32,25 +34,12 @@ export function renderAnalyzeSteps(index) {
     .map((label, i) => {
       const done = i < index;
       const active = i === index;
-      let dotBg, checkOp, textColor;
-      if (done) {
-        dotBg = '#16A34A';
-        checkOp = '1';
-        textColor = '#101826';
-      } else if (active) {
-        dotBg = '#2F6BFF';
-        checkOp = '0';
-        textColor = '#101826';
-      } else {
-        dotBg = '#D7DEEA';
-        checkOp = '0';
-        textColor = '#9AA4B2';
-      }
+      const state = done ? 'done' : active ? 'active' : 'pending';
       return `<div class="analyze-step">
-      <div class="step-dot" style="background:${dotBg};">
-        <span style="opacity:${checkOp};display:flex;"><svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M4 8.5l2.5 2.5 5-6" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <div class="step-dot" data-state="${state}">
+        <span class="step-check ${done ? 'is-visible' : ''}"><svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M4 8.5l2.5 2.5 5-6" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </div>
-      <span class="step-label" style="color:${textColor};">${label}</span>
+      <span class="step-label" data-state="${state}">${label}</span>
     </div>`;
     })
     .join('');

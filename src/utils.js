@@ -31,9 +31,9 @@ export function deduplicateArray(arr) {
 }
 
 export function band(s) {
-  if (s >= 75) return { color: '#16A34A', bg: '#E7F6EC', tint: '#B6E6C7' };
-  if (s >= 55) return { color: '#D98A00', bg: '#FFF6E6', tint: '#F5D79A' };
-  return { color: '#E5484D', bg: '#FDECEC', tint: '#F4B8B6' };
+  if (s >= 75) return { color: '#16A34A', bg: '#E7F6EC', tint: '#B6E6C7', className: 'score-badge--excellent' };
+  if (s >= 55) return { color: '#D98A00', bg: '#FFF6E6', tint: '#F5D79A', className: 'score-badge--good' };
+  return { color: '#E5484D', bg: '#FDECEC', tint: '#F4B8B6', className: 'score-badge--low' };
 }
 
 export function getAtsVerdict(score) {
