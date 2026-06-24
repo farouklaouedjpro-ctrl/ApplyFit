@@ -58,7 +58,8 @@ export function renderATS() {
   if (Array.isArray(ats.criteria)) {
     ats.criteria.forEach((c) => {
       const row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:10px;background:#f8f9fb';
+      row.style.cssText =
+        'display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:10px;background:#f8f9fb';
       const status = document.createElement('span');
       status.style.cssText = `flex-shrink:0;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;background:${c.passed ? '#16A34A' : '#E5484D'}`;
       status.textContent = c.passed ? 'OK' : 'KO';

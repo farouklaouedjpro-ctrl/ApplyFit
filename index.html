@@ -25,7 +25,7 @@
           </div>
         </div>
 
-        <div class="afb-new" style="padding: 16px 14px 8px">
+        <div class="afb-new">
           <button id="newAnalysisBtn" class="btn-primary">
             <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
               <path d="M8 3v10M3 8h10" stroke="#fff" stroke-width="1.8" stroke-linecap="round" />
@@ -38,8 +38,8 @@
         <div id="historyList" class="afb-hide-mobile sidebar-history"></div>
 
         <div class="afb-hide-mobile sidebar-user">
-          <div class="icon-circle" style="background: #2f6bff; color: #fff; font-size: 13px; font-weight: 700">U</div>
-          <div style="flex: 1; min-width: 0">
+          <div class="icon-circle sidebar-user-avatar">U</div>
+          <div class="flex-grow">
             <div class="sidebar-user-name">Utilisateur</div>
             <div class="sidebar-user-plan">Plan gratuit</div>
           </div>
@@ -70,15 +70,7 @@
 
           <div class="afb-inputs grid-2">
             <!-- CV panel -->
-            <div
-              data-drop="cv"
-              class="card"
-              style="
-                transition:
-                  border-color 0.2s,
-                  background 0.2s;
-              "
-            >
+            <div data-drop="cv" class="card card-drop">
               <div class="panel-header">
                 <div class="panel-title">
                   <div class="icon-box icon-box-blue">
@@ -150,9 +142,9 @@
                   <span class="btn-browse">Parcourir</span>
                   <div class="drop-zone-hint">PDF ou TXT — 5 Mo max</div>
                 </div>
-                <input type="file" id="cvFileInput" accept=".txt,.pdf" style="display: none" />
+                <input type="file" id="cvFileInput" accept=".txt,.pdf" class="is-hidden" />
               </div>
-              <div id="cvPastePanel" style="display: none">
+              <div id="cvPastePanel" class="is-hidden">
                 <textarea
                   id="cvText"
                   class="textarea"
@@ -163,15 +155,7 @@
             </div>
 
             <!-- Offer panel -->
-            <div
-              data-drop="offer"
-              class="card"
-              style="
-                transition:
-                  border-color 0.2s,
-                  background 0.2s;
-              "
-            >
+            <div data-drop="offer" class="card card-drop">
               <div class="panel-header">
                 <div class="panel-title">
                   <div class="icon-box icon-box-orange">
@@ -238,9 +222,9 @@
                   <span class="btn-browse">Parcourir</span>
                   <div class="drop-zone-hint">PDF ou TXT — 5 Mo max</div>
                 </div>
-                <input type="file" id="offerFileInput" accept=".txt,.pdf" style="display: none" />
+                <input type="file" id="offerFileInput" accept=".txt,.pdf" class="is-hidden" />
               </div>
-              <div id="offerPastePanel" style="display: none">
+              <div id="offerPastePanel" class="is-hidden">
                 <textarea
                   id="offerText"
                   class="textarea"
@@ -280,20 +264,15 @@
 
         <!-- VIEW: Analyzing -->
         <div id="viewAnalyzing" class="view-analyzing">
-          <div style="display: flex; align-items: flex-end; gap: 6px; height: 60px; margin-bottom: 30px">
-            <div class="afb-bar" style="animation-delay: 0s"></div>
-            <div class="afb-bar" style="animation-delay: 0.15s"></div>
-            <div class="afb-bar" style="animation-delay: 0.3s"></div>
-            <div class="afb-bar" style="animation-delay: 0.45s"></div>
+          <div class="analyze-bars">
+            <div class="afb-bar"></div>
+            <div class="afb-bar"></div>
+            <div class="afb-bar"></div>
+            <div class="afb-bar"></div>
           </div>
-          <h2 class="font-grotesk" style="font-size: 24px; font-weight: 700; margin: 0 0 8px">Analyse en cours</h2>
-          <p class="text-muted" style="font-size: 14px; margin: 0 0 28px">
-            Extraction et mise en correspondance des compétences
-          </p>
-          <div
-            id="analyzeSteps"
-            style="width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 6px"
-          ></div>
+          <h2 class="font-grotesk analyze-title">Analyse en cours</h2>
+          <p class="text-muted analyze-subtitle">Extraction et mise en correspondance des compétences</p>
+          <div id="analyzeSteps" class="analyze-steps"></div>
         </div>
       </div>
     </div>
