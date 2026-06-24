@@ -47,13 +47,13 @@ export function renderHistory(activeIndex) {
     .map((h, i) => {
       const b = band(h.score);
       const isActive = i === (activeIndex !== undefined ? activeIndex : 0);
-      return `<div class="history-item" data-index="${i}" style="background:${isActive ? 'rgba(47,107,255,.14)' : 'transparent'};">
-      <div style="width:38px;height:38px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;background:${b.bg};color:${b.color};">${h.score}</div>
-      <div style="min-width:0;flex:1;">
-        <div class="history-job-title" data-index="${i}" style="font-size:13px;font-weight:600;color:${isActive ? '#fff' : '#C7D0DE'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:text;">${escapeHtml(h.job)}</div>
-        <div style="font-size:11px;color:#6B7689;">${h.date}</div>
+      return `<div class="history-item ${isActive ? 'is-active' : ''}" data-index="${i}">
+      <div class="score-badge ${b.className}">${h.score}</div>
+      <div class="history-item-content">
+        <div class="history-job-title" data-index="${i}">${escapeHtml(h.job)}</div>
+        <div class="history-date">${h.date}</div>
       </div>
-      <button class="history-delete" title="Supprimer" style="width:26px;height:26px;border-radius:6px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:0;transition:opacity .15s,background .15s;" onmouseover="this.style.opacity='1';this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.opacity='0';this.style.background='transparent'">
+      <button class="history-delete" title="Supprimer">
         <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="#9AA4B2" stroke-width="1.7" stroke-linecap="round"/></svg>
       </button>
     </div>`;
@@ -72,8 +72,7 @@ export function renderHistory(activeIndex) {
         saveHistory();
         if (wasActive) clearActiveAnalysis();
         if (historyData.length === 0) {
-          $('historyList').innerHTML =
-            '<div style="padding:20px 12px;text-align:center;font-size:13px;color:#5B6678;">Aucune analyse</div>';
+          $('historyList').innerHTML = '<div class="history-empty">Aucune analyse</div>';
           return;
         }
         const newIdx = Math.min(idx, historyData.length - 1);
@@ -135,14 +134,12 @@ export function commitJobTitle(newTitle) {
 }
 
 export function makeJobTitleEditable(el, onCommit) {
-  el.style.cursor = 'text';
   el.addEventListener('dblclick', () => {
     const current = el.textContent;
     const input = document.createElement('input');
     input.type = 'text';
     input.value = current;
-    input.style.cssText =
-      'font-family:inherit;font-size:inherit;font-weight:inherit;background:transparent;border:none;border-bottom:2px solid #2F6BFF;outline:none;color:inherit;width:100%;padding:0;';
+    input.className = 'history-job-input';
     el.textContent = '';
     el.appendChild(input);
     input.focus();
